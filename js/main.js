@@ -50,7 +50,8 @@ function openGrownups() {
     <p class="note">To open settings, tap these numbers: <b>${code.map((d) => DIGIT_WORDS[d]).join(", ")}</b></p>
     <div class="entered" aria-live="polite"><i></i><i></i><i></i></div>
     <div class="keypad">${Array.from({ length: 9 }, (_, i) => `<button data-d="${i + 1}">${i + 1}</button>`).join("")}</div>
-    <button class="soft cancel">Cancel</button>`);
+    <button class="soft cancel">Cancel</button>
+    <p class="note version">Number Garden ${APP_VERSION}</p>`);
   const typed = [];
   const dots = el.querySelectorAll(".entered i");
   el.querySelector(".keypad").addEventListener("click", (e) => {
