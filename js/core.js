@@ -3,7 +3,7 @@
 // are shared with the game scripts that load after it.
 "use strict";
 
-const APP_VERSION = "1.5"; // shown in the grown-ups panel, to check a tablet has the latest update
+const APP_VERSION = "1.6"; // shown in the grown-ups panel, to check a tablet has the latest update
 const STORE_KEY = "balloon-pop-maths"; // original key, so existing scores carry over
 const ROUNDS_PER_LEVEL = 4;
 const COLORS = [
@@ -74,28 +74,46 @@ function fanfare() { NOTES.forEach((n, i) => tone(n, i * 0.11, i === 3 ? 0.5 : 0
 // Apple ships joke voices (Albert, Bubbles, Zarvox…) that must never be picked automatically.
 // Includes Apple's robotic "Eloquence" voices (Eddy, Flo, Reed, Rocko, Sandy, Shelley, Grandma, Grandpa).
 const NOVELTY_VOICES = /\b(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|good news|hysterical|jester|organ|superstar|trinoids|whisper|wobble|zarvox|fred|junior|ralph|kathy|princess|grandma|grandpa|eddy|flo|reed|rocko|sandy|shelley)\b/i;
-let voices = [];
+// On iPad a downloaded Premium/Enhanced voice can share its name with the basic one ("Daniel" twice),
+// so voices are identified by voiceURI (e.g. com.apple.voice.premium.en-GB.Serena), which also tells the quality.
+let voices = [];      // English voices
+let allVoices = [];   // everything the device reports (for the "show all" list)
 function loadVoices() {
-  try { voices = speechSynthesis.getVoices().filter((v) => /^en[-_]/i.test(v.lang)); } catch { voices = []; }
+  try { allVoices = speechSynthesis.getVoices(); } catch { allVoices = []; }
+  voices = allVoices.filter((v) => /^en($|[-_])/i.test(v.lang || ""));
 }
 if ("speechSynthesis" in window) {
   loadVoices();
   speechSynthesis.addEventListener?.("voiceschanged", loadVoices);
 }
+const voiceKey = (v) => v.voiceURI || v.name;
+const voiceId = (v) => `${v.voiceURI || ""} ${v.name}`;
+function voiceQuality(v) {
+  const id = voiceId(v);
+  if (NOVELTY_VOICES.test(v.name) || /speech\.synthesis\.voice|eloquence/i.test(id)) return "novelty";
+  if (/premium/i.test(id)) return "Premium";
+  if (/enhanced|neural|natural/i.test(id)) return "Enhanced";
+  return "";
+}
+const isNovelty = (v) => voiceQuality(v) === "novelty";
 function voiceScore(v) {
-  if (NOVELTY_VOICES.test(v.name)) return -100;
+  const q = voiceQuality(v);
+  if (q === "novelty") return -100;
   let s = 0;
   if (/en[-_]GB/i.test(v.lang)) s += 10;
   else if (/en[-_](IE|AU|NZ)/i.test(v.lang)) s += 4;
-  if (/premium/i.test(v.name)) s += 8;
-  else if (/enhanced|neural|natural/i.test(v.name)) s += 6;
+  if (q === "Premium") s += 8;
+  else if (q === "Enhanced") s += 6;
   if (/google/i.test(v.name)) s += 2;
   if (v.localService) s += 1;
   return s;
 }
-const goodVoices = () => voices.filter((v) => !NOVELTY_VOICES.test(v.name)).sort((a, b) => voiceScore(b) - voiceScore(a));
+const goodVoices = () => voices.filter((v) => !isNovelty(v)).sort((a, b) => voiceScore(b) - voiceScore(a));
 function pickVoice() {
-  if (S.voice) { const v = voices.find((x) => x.name === S.voice); if (v) return v; }
+  if (S.voice) {
+    const v = allVoices.find((x) => voiceKey(x) === S.voice) || allVoices.find((x) => x.name === S.voice);
+    if (v) return v;
+  }
   return goodVoices()[0] || null;
 }
 

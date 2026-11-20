@@ -68,30 +68,50 @@ function openGrownups() {
 
 function openVoicePicker() {
   loadVoices();
+  let showAll = false;
   const el = sheet(`
       <h2>Choose a voice</h2>
-      <p class="note">Tap a voice to hear it. Best are <b>Enhanced</b> or <b>Premium</b> voices. On an iPad you can download them in
-        Settings → Accessibility → Spoken Content → Voices → English, then reopen this list.</p>
+      <p class="note">Tap a voice to hear it. Best are <b>Premium</b> or <b>Enhanced</b> voices. On an iPad, download them in
+        Settings → Accessibility → Spoken Content → Voices → English. New voices may only show up after
+        fully closing and reopening the app.</p>
       <div class="voice-list"></div>
+      <button class="soft show-all">Show all voices</button>
       <button class="check done">Done</button>
-      <p class="note version">Number Garden ${APP_VERSION}</p>`);
+      <p class="note version">Number Garden ${APP_VERSION} · <span class="count"></span></p>`);
   const list = el.querySelector(".voice-list");
-  const current = pickVoice();
-  const opts = goodVoices();
-  if (!opts.length) list.append(h('<p class="note">No English voices found on this device.</p>'));
-  for (const v of opts) {
-    const b = h('<button class="voice"><span></span><small></small></button>');
-    b.querySelector("span").textContent = v.name;
-    b.querySelector("small").textContent = v.lang.replace("_", "-");
-    if (current && v.name === current.name) b.classList.add("on");
-    b.onclick = () => {
-      S.voice = v.name; S.sound = true; save(); renderControls();
-      list.querySelectorAll(".voice").forEach((x) => x.classList.toggle("on", x === b));
-      say("Hello! Pop the smallest number first!");
-    };
-    list.append(b);
+  const LANG = { "en-GB": "UK", "en-US": "US", "en-AU": "Australia", "en-IE": "Ireland", "en-IN": "India", "en-ZA": "South Africa", "en-NZ": "New Zealand" };
+  function render() {
+    loadVoices();
+    const current = pickVoice();
+    // "Show all" lists every voice the device reports, including joke and non-English voices.
+    const opts = showAll ? [...allVoices].sort((a, b) => voiceScore(b) - voiceScore(a)) : goodVoices();
+    el.querySelector(".count").textContent = `${allVoices.length} voices on this device, ${voices.length} English`;
+    list.replaceChildren();
+    if (!opts.length) list.append(h('<p class="note">No voices found yet. Close and reopen the app, then try again.</p>'));
+    for (const v of opts) {
+      const b = h('<button class="voice"><span></span><small></small></button>');
+      const q = voiceQuality(v), lang = (v.lang || "").replace("_", "-");
+      b.querySelector("span").textContent = v.name + (q && q !== "novelty" && !v.name.includes(q) ? ` (${q})` : "");
+      b.querySelector("small").textContent = [LANG[lang] || lang, q === "novelty" ? "joke voice" : ""].filter(Boolean).join(" · ");
+      if (current && voiceKey(v) === voiceKey(current)) b.classList.add("on");
+      b.onclick = () => {
+        S.voice = voiceKey(v); S.sound = true; save(); renderControls();
+        list.querySelectorAll(".voice").forEach((x) => x.classList.toggle("on", x === b));
+        say("Hello! Pop the smallest number first!");
+      };
+      list.append(b);
+    }
   }
-  el.querySelector(".done").onclick = () => el.remove();
+  render();
+  // Voices can arrive late (or change after a download); refresh while the panel is open.
+  const onChange = () => { if (el.isConnected) render(); };
+  speechSynthesis?.addEventListener?.("voiceschanged", onChange);
+  el.querySelector(".show-all").onclick = (e) => {
+    showAll = !showAll;
+    e.currentTarget.textContent = showAll ? "Show best voices only" : "Show all voices";
+    render();
+  };
+  el.querySelector(".done").onclick = () => { speechSynthesis?.removeEventListener?.("voiceschanged", onChange); el.remove(); };
 }
 addEventListener("hashchange", show);
 

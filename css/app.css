@@ -354,6 +354,7 @@ button:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
 .voice.on { border-color: var(--good); background: #e6f6ea; }
 .panel .done { align-self: center; height: 60px; font-size: 1.5rem; }
 .panel .version { text-align: center; font-size: 0.85rem; }
+.panel .show-all { align-self: center; height: 48px; font-size: 1.05rem; box-shadow: 0 4px 0 var(--lift); border: 2px solid var(--sky-low); }
 .panel .cancel { align-self: center; height: 56px; box-shadow: 0 4px 0 var(--lift); border: 2px solid var(--sky-low); }
 .entered { display: flex; justify-content: center; gap: 12px; }
 .entered i { width: 18px; height: 18px; border-radius: 50%; border: 3px solid var(--muted); }
