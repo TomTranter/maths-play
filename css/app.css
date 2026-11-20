@@ -325,17 +325,26 @@ button:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
 /* ---------- grown-ups voice picker ---------- */
 .sheet {
   position: fixed; inset: 0; z-index: 20; background: rgba(29, 53, 87, 0.5);
-  display: grid; place-items: center;
-  padding-left: var(--gutter-l); padding-right: var(--gutter-r); padding-block: 16px;
+  display: flex; align-items: center; justify-content: center;
+  padding-left: var(--gutter-l); padding-right: var(--gutter-r);
+  padding-top: calc(16px + env(safe-area-inset-top, 0px)); padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto; overscroll-behavior: contain;
 }
+/* The panel must fit the screen so the voice list (dozens of voices on an iPad) scrolls inside it. */
 .panel {
   background: var(--paper); border-radius: 26px; padding: 18px 20px 20px; width: min(520px, 100%);
   max-height: 100%; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 8px 0 var(--lift);
+  min-height: 0;
 }
 .panel h2 { margin: 0; font-size: 1.7rem; line-height: 1.1; }
 .panel .note { margin: 0; font-size: 1rem; font-weight: 600; line-height: 1.35; color: var(--muted); }
 .panel .note b { color: var(--ink); }
-.voice-list { overflow-y: auto; min-height: 0; display: grid; gap: 6px; padding: 2px; }
+.voice-list {
+  flex: 1 1 auto; min-height: 120px; overflow-y: auto; display: grid; align-content: start; gap: 6px; padding: 2px;
+  overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y;
+  border-block: 2px solid var(--sky-low);
+}
+.panel > :not(.voice-list) { flex: none; }
 .voice {
   border: 2px solid var(--sky-low); background: var(--paper); border-radius: 14px; padding: 8px 14px;
   display: flex; justify-content: space-between; align-items: center; gap: 10px; text-align: left;
