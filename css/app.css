@@ -159,7 +159,7 @@ button:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
   font-size: clamp(1.1rem, 4.3vw, 1.5rem); font-weight: 800; line-height: 1.1; text-align: center;
   box-shadow: 0 6px 0 var(--lift); min-width: 0;
 }
-.tile svg { width: 100%; max-width: 150px; height: auto; margin-bottom: 4px; }
+.tile svg { width: 100%; max-width: 150px; max-height: 12vh; height: auto; margin-bottom: 4px; }
 .tile small { font-size: 0.8rem; font-weight: 600; color: var(--muted); letter-spacing: 0.02em; }
 
 /* small number boxes (balloon tray, sequences) */
@@ -246,7 +246,7 @@ button:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
   box-shadow: 0 6px 0 var(--lift);
 }
 .rack.size20 { --b: clamp(22px, min(5.8vw, 8vh), 46px); }
-.rack.size100 { --b: clamp(18px, min(5.4vw, 4.4vh), 32px); }
+.rack.size100 { --b: clamp(18px, min(5.4vw, 4vh), 32px); }
 .wire { position: relative; height: var(--b); width: calc(var(--b) * 14); max-width: 100%; }
 .wire.gap { margin-bottom: calc(var(--b) * 0.45); }
 .wire::before { content: ""; position: absolute; left: -10px; right: -10px; top: 50%; height: 4px; margin-top: -2px; background: var(--wood-dark); border-radius: 2px; }
@@ -321,6 +321,66 @@ button:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
   padding: 6px 16px; display: flex; align-items: center; gap: 8px; font-size: 1.2rem; font-weight: 800; min-height: 60px;
 }
 .hand-btn svg { width: 34px; height: 34px; }
+
+/* ---------- fair shares ---------- */
+.share-cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+.share-card {
+  border: 0; background: var(--paper); border-radius: 24px; padding: 10px; box-shadow: 0 6px 0 var(--lift);
+  width: clamp(96px, 27vw, 200px);
+}
+.share-card:disabled { opacity: 0.4; }
+.share-card svg, .share-big svg { display: block; width: 100%; height: auto; }
+.share-big { width: min(72vw, 44vh, 360px); background: var(--paper); border-radius: 28px; padding: 12px; box-shadow: 0 6px 0 var(--lift); }
+.share-big .part { cursor: pointer; }
+.part { stroke: var(--paper); stroke-width: 3; }
+.part.on { fill: var(--cube); }
+
+/* ---------- party bags ---------- */
+.bags-wrap { display: grid; gap: 18px; justify-items: center; width: 100%; }
+.pile { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-width: 560px; min-height: 48px; }
+.sweet { width: 48px; height: 32px; border: 0; padding: 0; background: none; display: block; }
+.sweet svg, .sweet-fly svg { width: 100%; height: 100%; display: block; }
+.sweet-fly { width: 44px; height: 30px; }
+.bags { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.bag {
+  width: clamp(96px, 26vw, 150px); aspect-ratio: 4 / 5; border: 0; position: relative;
+  padding: 24px 6px 8px; background: linear-gradient(#f3d6a4, #e2b874);
+  border-radius: 8px 8px 20px 20px; box-shadow: 0 6px 0 var(--lift);
+  display: flex; flex-wrap: wrap; align-content: flex-end; justify-content: center; gap: 2px;
+}
+.bag::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 16px; background: #d9a95c; border-radius: 8px 8px 0 0; }
+.bag .sweet { width: 46%; height: auto; aspect-ratio: 3 / 2; }
+.bag.many .sweet { width: 31%; } /* 7–10 sweets: three to a row */
+
+/* ---------- balance scales ---------- */
+.balance { width: min(100%, 560px, 80vh); display: grid; justify-items: center; gap: 8px; }
+.balance svg { width: 100%; height: auto; display: block; overflow: visible; }
+.balance .obj-hit { cursor: pointer; }
+.blk { font-family: var(--font-display); font-weight: 800; font-size: 22px; fill: var(--ink); }
+.blk-n { fill: var(--paper); paint-order: stroke; stroke: var(--ink); stroke-width: 3px; }
+.eq {
+  font-size: clamp(1.8rem, 8vw, 2.8rem); font-weight: 800; background: var(--paper); border-radius: 18px;
+  padding: 2px 22px; box-shadow: 0 5px 0 var(--lift); font-variant-numeric: tabular-nums;
+}
+.eq .q { color: var(--pink); }
+
+/* ---------- shape hunt ---------- */
+.hunt { width: min(100%, 760px, 130vh); }
+.hunt svg { width: 100%; height: auto; display: block; background: var(--paper-soft); border-radius: 24px; }
+.hunt .shp { cursor: pointer; stroke: var(--ink); stroke-width: 3; }
+.hunt .shp.found { stroke: var(--good); stroke-width: 7; }
+.hunt .shp.hint { animation: shapehint 0.9s ease-in-out infinite; }
+@keyframes shapehint { 50% { stroke: var(--sun); stroke-width: 9; } }
+.box.sm svg { width: 80%; height: 80%; }
+.shape-big { width: min(64vw, 40vh, 300px); }
+.shape-big svg { width: 100%; height: auto; display: block; overflow: visible; }
+.shape-big .shp { stroke: var(--ink); stroke-width: 4; }
+.riddle-mark {
+  width: min(40vw, 30vh, 200px); aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%;
+  background: var(--paper); box-shadow: 0 6px 0 var(--lift); font-size: min(26vw, 18vh, 130px); font-weight: 800; color: var(--pink);
+}
+.choice.pic { width: auto; aspect-ratio: auto; display: flex; flex-direction: column; align-items: center; gap: 0; padding: 8px 14px; font-size: 1.1rem; }
+.choice.pic svg { width: clamp(52px, 14vw, 72px); height: auto; }
 
 /* ---------- grown-ups voice picker ---------- */
 .sheet {

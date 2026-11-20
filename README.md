@@ -18,6 +18,10 @@ It is a self-contained web app: plain HTML, CSS and JavaScript, no build step, n
 | Hundred Square | Counting in 10s, 5s and 2s; one more and one less | Y1 count in multiples of 2, 5, 10; one more/less |
 | Coin Shop | Paying with UK coins; counting a purse of coins | Y1 recognise coins; Y2 combine amounts |
 | Clock | Reading and setting o'clock, half past, quarter past/to | Y1 hour and half past; Y2 quarter past/to |
+| Fair Shares | Spotting shapes cut into equal halves/quarters; colouring a half or a quarter | Y1 recognise a half and a quarter |
+| Party Bags | Sharing sweets into bags, filling bags equally, counting bags in 2s, 5s, 10s | Y1 grouping and sharing; Y2 2, 5, 10 times tables |
+| Balance Scales | Heavier/lighter on a scale; making both sides equal (8 + 5 = 10 + ?) | Y1 compare mass; = sign and missing numbers |
+| Shape Hunt | Finding every shape of a kind; sides, corners and "What am I?" riddles | Y1 name 2D shapes; Y2 sides and corners |
 
 Each game has levels. Four correct answers move up a level; tap the level button to change it by hand.
 A right answer scores 2 stars (1 after a mistake). Progress and stars are kept in the browser (`localStorage`).

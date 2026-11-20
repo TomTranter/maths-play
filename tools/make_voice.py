@@ -70,6 +70,19 @@ PHRASES = [
     # clock
     "What time is it?", "Look at the short hand.", "Look at the long hand first.", "Look at the long hand.",
     "It's", "o'clock", "half past", "quarter past", "quarter to", "Make the clock say", "quarter past and to",
+    # fair shares
+    "Which one is cut in half?", "Which one is cut into quarters?", "Those parts are not equal.",
+    "Halves are 2 equal parts.", "Quarters are 4 equal parts.", "2 equal parts make halves.", "4 equal parts make quarters.",
+    "Colour half.", "Colour a quarter.", "That's half.", "That's a quarter.", "Colour some more.", "Tap one to take it off.",
+    # party bags
+    "Tap a sweet to share it.", "Tap a bag to add a sweet.", "How many sweets in each bag?",
+    "Count the sweets in one bag.", "How many sweets altogether?",
+    # balance scales
+    "Which is heavier?", "Which is lighter?", "Tap it.", "Look at the scale.", "The heavier side goes down.",
+    "The lighter side goes up.", "Make it balance!", "What goes in the empty space?", "Too heavy!",
+    "Try a smaller number.", "Not heavy enough!", "Try a bigger number.",
+    # shape hunt
+    "Look again.", "Count the sides.",
 ]
 STEPS = {"2s": "twos", "5s": "fives", "10s": "tens"}
 
@@ -143,6 +156,33 @@ def sentences() -> list[str]:
         for m in (0, 15, 30, 45):
             label = time_label(h, m)
             s += [f"It's {label}.", f"Make the clock say {label}."]
+    # level-up labels for the newer games
+    s += ["Halves.", "Quarters.", "Halves & quarters.", "Share.", "Fill the bags.", "Count in 2s, 5s, 10s.",
+          "Heavier, lighter.", "Balance to 10.", "Balance to 20.", "Find the shape.", "More shapes.", "Sides & corners."]
+    # party bags (bags.js)
+    for b in (2, 3):
+        for k in range(2, 6):
+            s += [f"Share {b * k} sweets into {b} bags.", f"{b * k} shared into {b} bags is {k} each."]
+    for k in range(2, 6):
+        s += [f"Put {k} sweets in each bag.", f"Check every bag has {k}."]
+    groups = {(b, k) for b in range(2, 5) for k in range(2, 6)} | {(b, k) for b in range(2, 6) for k in (2, 5, 10)}
+    s += [f"{b} bags of {k} is {b * k}." for b, k in sorted(groups)]
+    # balance scales (balance.js)
+    for obj in ("feather", "apple", "book", "pumpkin", "watermelon"):
+        s += [f"The {obj} is heavier.", f"The {obj} is lighter."]
+    s += [f"Both sides make {n}." for n in range(2, 21)]
+    # shape hunt (shapes.js)
+    shapes_ = {"circle": "circles", "triangle": "triangles", "square": "squares", "rectangle": "rectangles",
+               "pentagon": "pentagons", "hexagon": "hexagons"}
+    for one, many in shapes_.items():
+        s += [f"Tap all the {many}.", f"That's a {one}.", f"Find a {one}.", f"It's a {one}."]
+        s += [f"That's all {n} {many}." for n in range(2, 5)]
+    for one, sides in (("triangle", 3), ("square", 4), ("rectangle", 4), ("pentagon", 5), ("hexagon", 6)):
+        for what in ("sides", "corners"):
+            s += [f"How many {what} does a {one} have?", f"A {one} has {sides} {what}."]
+    s += ["I am round and I have no corners.", "What am I?", "I have 3 sides and 3 corners.",
+          "I have 4 sides that are all the same length.", "I have 4 sides.", "2 are long and 2 are short.",
+          "I have 5 sides and 5 corners.", "I have 6 sides and 6 corners."]
     return s
 
 
