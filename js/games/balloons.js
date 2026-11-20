@@ -88,9 +88,11 @@ const balloons = {
 
     const slot = task.step;
     const box = document.querySelectorAll(".box")[slot];
+    const sign = slot > 0 ? document.querySelectorAll(".sign")[slot - 1] : null;
     const fill = () => {
+      if (!box?.isConnected) return; // the round moved on while the number was flying
       box.textContent = n; box.classList.add("filled");
-      if (slot > 0) document.querySelectorAll(".sign")[slot - 1].classList.add("on");
+      sign?.classList.add("on");
     };
     if (reduced) fill();
     else {

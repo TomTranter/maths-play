@@ -71,13 +71,13 @@ function openVoicePicker() {
   let showAll = false;
   const el = sheet(`
       <h2>Choose a voice</h2>
-      <p class="note">Tap a voice to hear it. Best are <b>Premium</b> or <b>Enhanced</b> voices. On an iPad, download them in
-        Settings → Accessibility → Spoken Content → Voices → English. New voices may only show up after
-        fully closing and reopening the app.</p>
+      <p class="note">Tap a voice to hear it. <b>Poppy</b> is recorded into the app, so she sounds the same on every
+        device and works offline. The others are this device's own voices.</p>
       <div class="voice-list"></div>
       <button class="soft show-all">Show all voices</button>
       <button class="check done">Done</button>
-      <p class="note version">Number Garden ${APP_VERSION} · <span class="count"></span></p>`);
+      <p class="note version">Number Garden ${APP_VERSION} · <span class="count"></span></p>
+      <p class="note version">Poppy voice: SEMAINE database (DFKI), CC BY-NC-SA 4.0, made with Piper.</p>`);
   const list = el.querySelector(".voice-list");
   const LANG = { "en-GB": "UK", "en-US": "US", "en-AU": "Australia", "en-IE": "Ireland", "en-IN": "India", "en-ZA": "South Africa", "en-NZ": "New Zealand" };
   function render() {
@@ -87,17 +87,25 @@ function openVoicePicker() {
     const opts = showAll ? [...allVoices].sort((a, b) => voiceScore(b) - voiceScore(a)) : goodVoices();
     el.querySelector(".count").textContent = `${allVoices.length} voices on this device, ${voices.length} English`;
     list.replaceChildren();
-    if (!opts.length) list.append(h('<p class="note">No voices found yet. Close and reopen the app, then try again.</p>'));
+    const sample = () => say("Hello! Pop the smallest number first!");
+    const poppy = h('<button class="voice"><span>Poppy</span><small>Recorded · UK · works offline</small></button>');
+    poppy.classList.toggle("on", useRecorded());
+    poppy.onclick = () => {
+      S.voice = RECORDED_VOICE; S.sound = true; save(); renderControls();
+      list.querySelectorAll(".voice").forEach((x) => x.classList.toggle("on", x === poppy));
+      sample();
+    };
+    list.append(poppy);
     for (const v of opts) {
       const b = h('<button class="voice"><span></span><small></small></button>');
       const q = voiceQuality(v), lang = (v.lang || "").replace("_", "-");
       b.querySelector("span").textContent = v.name + (q && q !== "novelty" && !v.name.includes(q) ? ` (${q})` : "");
       b.querySelector("small").textContent = [LANG[lang] || lang, q === "novelty" ? "joke voice" : ""].filter(Boolean).join(" · ");
-      if (current && voiceKey(v) === voiceKey(current)) b.classList.add("on");
+      if (!useRecorded() && current && voiceKey(v) === voiceKey(current)) b.classList.add("on");
       b.onclick = () => {
         S.voice = voiceKey(v); S.sound = true; save(); renderControls();
         list.querySelectorAll(".voice").forEach((x) => x.classList.toggle("on", x === b));
-        say("Hello! Pop the smallest number first!");
+        sample();
       };
       list.append(b);
     }
@@ -122,6 +130,9 @@ addEventListener("hashchange", show);
   S.mode = saved.mode === "down" ? "down" : "up";
   S.prog = saved.prog && typeof saved.prog === "object" ? saved.prog : {};
   S.voice = typeof saved.voice === "string" ? saved.voice : "";
+  if (saved.voiceV !== 2) S.voice = ""; // v1.7: switch everyone to the recorded Poppy voice once
+  S.voiceV = 2;
+  save();
   show();
 })();
 

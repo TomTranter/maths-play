@@ -22,9 +22,18 @@ It is a self-contained web app: plain HTML, CSS and JavaScript, no build step, n
 Each game has levels. Four correct answers move up a level; tap the level button to change it by hand.
 A right answer scores 2 stars (1 after a mistake). Progress and stars are kept in the browser (`localStorage`).
 
-**Voice:** the app picks the best English voice on the device (British, and Enhanced/Premium voices first;
-Apple's joke voices are skipped). Grown-ups can choose another from the **Grown-ups** button on the home screen (or by holding the speaker button for a second); a quick "tap the numbers written as words" check keeps children out.
-On an iPad, nicer voices can be downloaded in *Settings → Accessibility → Spoken Content → Voices → English*.
+**Voice:** everything is spoken by **Poppy**, a voice recorded into the app as ~290 short clips (phrases,
+numbers 0–100, pence), so it sounds the same on every device and works offline. Sentences are assembled
+from clips at runtime; any line without clips falls back to the device's own voice. iPad Safari only gives
+web pages its basic voices (Enhanced/Premium downloads are hidden), which is why the voice is recorded.
+Grown-ups can switch to a device voice from the **Grown-ups** button on the home screen (or by holding the
+speaker button for a second); a quick "tap the numbers written as words" check keeps children out.
+
+Regenerate the clips with `uv run tools/make_voice.py` (needs the Piper model `en_GB-semaine-medium`
+in `~/.cache/piper-voices/`). When a game gets a new spoken line, add its phrases to `PHRASES` there.
+
+Poppy voice: [SEMAINE database](https://github.com/marytts/dfki-semaine-data) (DFKI), CC BY-NC-SA 4.0,
+via [Piper](https://github.com/rhasspy/piper). Non-commercial use only.
 
 ## Run it
 
@@ -49,6 +58,8 @@ sw.js                   offline cache (network-first; bump CACHE when the file l
 manifest.webmanifest    install metadata
 fonts/                  Baloo 2 (SIL Open Font License, see fonts/OFL.txt)
 icons/                  app icons
+audio/poppy/            recorded voice clips + manifest.json (generated)
+tools/make_voice.py     renders the voice clips with Piper
 ```
 
 ## Adding a game

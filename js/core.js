@@ -3,7 +3,7 @@
 // are shared with the game scripts that load after it.
 "use strict";
 
-const APP_VERSION = "1.6"; // shown in the grown-ups panel, to check a tablet has the latest update
+const APP_VERSION = "1.7"; // shown in the grown-ups panel, to check a tablet has the latest update
 const STORE_KEY = "balloon-pop-maths"; // original key, so existing scores carry over
 const ROUNDS_PER_LEVEL = 4;
 const COLORS = [
@@ -36,7 +36,11 @@ let ac = null;
 function audio() {
   if (!S.sound) return null;
   try {
-    if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
+    if (!ac) {
+      // iPad: let the game's sound play even when the silent switch is on (Safari 16.4+).
+      try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch {}
+      ac = new (window.AudioContext || window.webkitAudioContext)();
+    }
     if (ac.state === "suspended") ac.resume();
   } catch { ac = null; }
   return ac;
@@ -110,11 +114,97 @@ function voiceScore(v) {
 }
 const goodVoices = () => voices.filter((v) => !isNovelty(v)).sort((a, b) => voiceScore(b) - voiceScore(a));
 function pickVoice() {
-  if (S.voice) {
+  if (S.voice && S.voice !== RECORDED_VOICE) {
     const v = allVoices.find((x) => voiceKey(x) === S.voice) || allVoices.find((x) => x.name === S.voice);
     if (v) return v;
   }
   return goodVoices()[0] || null;
+}
+
+/* ---- recorded voice (Poppy) ----
+   The default voice is a set of pre-recorded clips (tools/make_voice.py), because iPad Safari only gives
+   web pages its basic voices. A sentence is split into clip keys: numbers ("#34", "#34p", "#5s") and runs
+   of words matched longest-first. If any part has no clip, the whole line falls back to the device voice. */
+const RECORDED_VOICE = "recorded:poppy";
+const CLIP_BASE = "audio/poppy/";
+let clipMap = null;
+fetch(CLIP_BASE + "manifest.json").then((r) => r.json()).then((m) => { clipMap = m; }).catch(() => {});
+const useRecorded = () => !S.voice || S.voice === RECORDED_VOICE;
+
+function toClips(text) {
+  if (!clipMap) return null;
+  const t = text.toLowerCase().replace(/’/g, "'").replace(/&/g, " and ").replace(/([a-z']),\s+(?=[a-z])/g, "$1 ");
+  const toks = t.match(/\d+[ps]?|[a-z']+|[.!?,]/g) || [];
+  const seq = [];
+  let i = 0;
+  while (i < toks.length) {
+    const tk = toks[i];
+    if (/^[.!?]$/.test(tk)) { seq.push({ pause: 0.22 }); i++; continue; }
+    if (tk === ",") { seq.push({ pause: 0.12 }); i++; continue; }
+    if (/^\d/.test(tk)) {
+      const f = clipMap["#" + tk];
+      if (!f) return null;
+      seq.push({ file: f }); i++; continue;
+    }
+    let j = i;
+    while (j < toks.length && /^[a-z']+$/.test(toks[j])) j++;
+    let e = j;
+    for (; e > i; e--) {
+      const f = clipMap[toks.slice(i, e).join(" ")];
+      if (f) { seq.push({ file: f }); break; }
+    }
+    if (e === i) return null;
+    i = e;
+  }
+  while (seq.length && seq.at(-1).pause) seq.pop(); // no dead air at the end of a line
+  return seq;
+}
+
+const clipBuffers = new Map(); // file -> Promise<AudioBuffer>; capped so a long session doesn't hoard memory
+function loadClip(a, file) {
+  if (!clipBuffers.has(file)) {
+    if (clipBuffers.size > 160) clipBuffers.delete(clipBuffers.keys().next().value);
+    const p = fetch(CLIP_BASE + file)
+      .then((r) => r.arrayBuffer())
+      .then((b) => new Promise((ok, fail) => a.decodeAudioData(b, ok, fail)));
+    p.catch(() => clipBuffers.delete(file));
+    clipBuffers.set(file, p);
+  }
+  return clipBuffers.get(file);
+}
+
+let clipRun = null; // the line currently playing: { sources, finish }
+function stopClips() {
+  if (!clipRun) return;
+  const run = clipRun; clipRun = null;
+  run.sources.forEach((s) => { try { s.stop(); } catch {} });
+  run.finish();
+}
+// Plays a clip sequence; resolves true when finished or cut off, false if it couldn't play at all.
+async function playClips(seq) {
+  const a = audio();
+  if (!a) return false;
+  stopClips();
+  let finish;
+  const done = new Promise((r) => (finish = r));
+  const run = { sources: [], finish: () => finish(true) };
+  clipRun = run;
+  let bufs;
+  try { bufs = await Promise.all(seq.map((s) => (s.file ? loadClip(a, s.file) : null))); }
+  catch { if (clipRun === run) clipRun = null; return false; }
+  if (clipRun !== run) return true; // a newer line started while loading
+  let t = a.currentTime + 0.04;
+  seq.forEach((s, k) => {
+    if (s.pause) { t += s.pause; return; }
+    const src = a.createBufferSource();
+    src.buffer = bufs[k];
+    src.connect(a.destination);
+    src.start(t);
+    run.sources.push(src);
+    t += bufs[k].duration + 0.035;
+  });
+  setTimeout(() => { if (clipRun === run) { clipRun = null; finish(true); } }, (t - a.currentTime) * 1000 + 30);
+  return done;
 }
 
 // Speaks a line and resolves when it has finished (or was cut off by a newer line).
@@ -122,8 +212,17 @@ function pickVoice() {
 let currentUtterance = null; // held so Chrome doesn't garbage-collect it and drop onend
 function say(text, delay = 0) {
   return new Promise((resolve) => {
-    if (!text || !S.sound || !("speechSynthesis" in window)) return resolve();
-    setTimeout(() => {
+    if (!text || !S.sound) return resolve();
+    setTimeout(async () => {
+      if (useRecorded()) {
+        const seq = toClips(text);
+        if (seq) {
+          try { speechSynthesis.cancel(); } catch {}
+          if (await playClips(seq)) return resolve();
+        }
+      }
+      stopClips();
+      if (!("speechSynthesis" in window)) return resolve();
       let done = false;
       const finish = () => { if (!done) { done = true; resolve(); } };
       try {
