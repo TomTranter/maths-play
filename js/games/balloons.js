@@ -113,8 +113,9 @@ const balloons = {
         fanfare(); confetti();
         if (perfect) bumpScore(2);
         const up = advance();
-        banner(up ? "Level up!" : perfect ? "Perfect! +2" : "Well done!");
-        afterSpeech(say(up ? `Level up! ${level(balloons).label}` : perfect ? "Perfect!" : "Well done!", 200), 2000, () => balloons.next());
+        const p = perfect ? "Perfect!" : praise();
+        banner(up ? "Level up!" : perfect ? "Perfect! +2" : p);
+        afterSpeech(say(up ? `Level up! ${level(balloons).label}` : p, 200), 2000, () => balloons.next());
       });
     }
   },

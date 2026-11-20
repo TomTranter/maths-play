@@ -3,7 +3,7 @@
 // are shared with the game scripts that load after it.
 "use strict";
 
-const APP_VERSION = "1.9"; // shown in the grown-ups panel, to check a tablet has the latest update
+const APP_VERSION = "1.10"; // shown in the grown-ups panel, to check a tablet has the latest update
 const STORE_KEY = "balloon-pop-maths"; // original key, so existing scores carry over
 const ROUNDS_PER_LEVEL = 4;
 const COLORS = [
@@ -362,6 +362,15 @@ function afterSpeech(speech, minMs, fn) {
   Promise.all([speech.then(() => wait(400)), wait(minMs)]).then(() => { if (g === gen) fn(); });
 }
 
+// Varied praise for a right answer (each is a recorded clip in tools/make_voice.py PHRASES).
+const PRAISE = ["Yes!", "Well done!", "Brilliant!", "Great job!", "That's right!", "Fantastic!", "Spot on!"];
+let lastPraise = "";
+function praise() {
+  let p;
+  do { p = pick(PRAISE); } while (p === lastPraise);
+  return (lastPraise = p);
+}
+
 function win(el, text, spoken) {
   busy = true;
   const pts = task.mistakes === 0 ? 2 : 1;
@@ -369,6 +378,10 @@ function win(el, text, spoken) {
   floatText("plus", "+" + pts, r.left + r.width / 2, r.top);
   bumpScore(pts); fanfare(); confetti();
   task.onWin?.();
+  // Games write "Yes! …"; swap the opener for a random praise in both the banner and the voice.
+  const p = praise();
+  text = text.replace(/^Yes!/, p);
+  spoken = spoken.replace(/^(Yes|Brilliant)!/, p);
   const up = advance();
   const lvl = GAMES[route].levels[prog(route).level].label;
   banner(up ? "Level up!" : text, 1600);

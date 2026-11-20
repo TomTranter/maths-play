@@ -44,6 +44,8 @@ PHRASES = [
     "Yes!", "Oops!", "Perfect!", "Well done!", "Level up!", "Brilliant!", "Hello!", "Not quite.",
     "You need more.", "Too many!", "Take some away.", "That's", "and", "make", "is", "more", "less",
     "up to", "add to", "add", "take away", "count in", "count on", "Thank you!",
+    # praise for a right answer (PRAISE in js/core.js)
+    "Great job!", "That's right!", "Fantastic!", "Spot on!",
     # balloon pop
     "Pop the smallest number first!", "Pop the biggest number first!",
     "Is there a smaller number?", "Is there a bigger number?",
