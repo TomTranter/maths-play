@@ -493,6 +493,69 @@ button:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
 .pour-row { display: flex; gap: 12px; }
 .pour { height: 58px; font-size: 1.3rem; box-shadow: 0 5px 0 var(--lift); }
 
+/* ---------- hungry crocodile ---------- */
+.croc { display: flex; align-items: center; justify-content: center; gap: clamp(8px, 3vw, 24px); width: 100%; }
+.cside {
+  display: grid; justify-items: center; gap: 8px; background: var(--paper); border-radius: 24px; padding: 12px 18px;
+  box-shadow: 0 6px 0 var(--lift); min-width: clamp(96px, 28vw, 200px);
+}
+.cnum { font-size: clamp(2.4rem, 10vw, 4.4rem); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cdots { display: grid; grid-template-columns: repeat(5, 12px); gap: 4px; }
+.cdots i { width: 12px; height: 12px; border-radius: 50%; background: var(--counter); }
+.cgap {
+  width: clamp(64px, 18vw, 120px); aspect-ratio: 1.2; display: grid; place-items: center; border-radius: 20px;
+  border: 4px dashed var(--good); color: var(--good); font-size: 2.4rem; font-weight: 800; background: var(--paper-soft);
+}
+.cgap svg { width: 100%; height: auto; }
+.cgap.snap { border-color: transparent; background: none; animation: bump 0.35s ease-out; }
+.croc-btn svg { width: 80%; height: auto; }
+
+/* ---------- cherry bonds ---------- */
+.cherry { width: min(92vw, 46vh, 420px); }
+.cherry svg { width: 100%; height: auto; display: block; }
+.cherry .whole { fill: var(--counter); stroke: var(--counter-dark); stroke-width: 5; }
+.cherry .part { fill: #ff8a93; stroke: var(--counter-dark); stroke-width: 5; }
+.cherry .missing { fill: var(--paper); stroke-dasharray: 10 7; }
+.cherry-num { font-family: var(--font-display); font-weight: 800; font-size: 44px; fill: var(--paper); paint-order: stroke; stroke: var(--counter-dark); stroke-width: 5px; }
+.cherry-num.q { fill: var(--pink); stroke: none; }
+.cherry-eq { display: grid; justify-items: center; gap: 12px; }
+.cherry.small { width: min(56vw, 28vh, 240px); }
+.eq.big { font-size: clamp(2.2rem, 10vw, 3.6rem); }
+
+/* ---------- flower arrays ---------- */
+.arrays { display: grid; justify-items: center; gap: 12px; width: 100%; }
+.bed {
+  display: grid; gap: 4px; background: #c79a63; border: 5px solid var(--wood-dark); border-radius: 16px; padding: 8px;
+  width: min(100%, calc(var(--cols) * 54px + 26px), 600px);
+}
+.flower { display: block; }
+.flower svg { width: 100%; height: auto; display: block; }
+.steppers { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.stepper { display: flex; align-items: center; gap: 8px; background: var(--paper); border-radius: 18px; padding: 6px 10px; box-shadow: 0 4px 0 var(--lift); font-weight: 800; }
+.stepper > span { font-size: 1rem; color: var(--muted); }
+.stepper b { font-size: 2rem; min-width: 1.4ch; text-align: center; font-variant-numeric: tabular-nums; }
+.bed-slot { display: grid; justify-items: center; width: 100%; }
+
+/* ---------- calendar caterpillar ---------- */
+.caterpillar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2px; max-width: 100%; }
+.seg {
+  width: clamp(40px, 10.4vw, 84px); aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center;
+  background: #8ee07a; border: 4px solid #3f8f33; font-weight: 800; font-size: clamp(0.8rem, 3.2vw, 1.3rem);
+}
+.seg:nth-child(even) { transform: translateY(-8px); }
+.seg.hole { background: var(--paper); border-style: dashed; border-color: var(--pink); color: var(--pink); font-size: 1.6rem; }
+.cat-head {
+  width: clamp(44px, 11.6vw, 96px); aspect-ratio: 1; border-radius: 50%; background: #2ec27e; border: 4px solid #3f8f33;
+  display: flex; align-items: center; justify-content: center; gap: 8px; position: relative;
+}
+.cat-head i { width: 22%; aspect-ratio: 1; border-radius: 50%; background: var(--paper); box-shadow: inset 3px 0 0 3px var(--ink); }
+.season-card {
+  background: var(--paper); border-radius: 26px; padding: 18px 36px; box-shadow: 0 6px 0 var(--lift);
+  font-size: clamp(2rem, 9vw, 3.4rem); font-weight: 800;
+}
+.choice.wide.pic { flex-direction: row; gap: 8px; }
+.choice.wide.pic svg { width: 40px; }
+
 /* ---------- grown-ups voice picker ---------- */
 .sheet {
   position: fixed; inset: 0; z-index: 20; background: rgba(29, 53, 87, 0.5);

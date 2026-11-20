@@ -28,6 +28,10 @@ It is a self-contained web app: plain HTML, CSS and JavaScript, no build step, n
 | Farm Count | Counting animals into a tally chart or pictogram, then reading it | Y2 tally charts, pictograms, comparing totals |
 | Pattern Train | What comes next: colour, shape and number patterns (up/down in 1s, 2s, 5s, 10s) | Y2 patterns and sequences; counting in steps |
 | Full or Empty | Spotting full/half full/empty, pouring to a level, which container holds more | Y1 capacity and volume; Y2 compare capacity |
+| Hungry Crocodile | Choosing <, > or = (the crocodile eats the bigger number), with numbers and sums | Y1 more/less/equal; Y2 <, > and = signs |
+| Cherry Bonds | Part-whole cherry diagrams; missing parts and missing numbers (? + 3 = 7, 9 − ? = 4) | Y1 number bonds, missing number problems; Y2 inverse |
+| Flower Arrays | Counting arrays in 2s/5s/10s, times tables, building an array for a number | Y2 2, 5 and 10 times tables; commutativity |
+| Calendar Caterpillar | Days in order; before/after/tomorrow/yesterday; months and seasons | Y1 days of the week, months, dates language |
 
 Each game's level button opens a level list. **Grown-ups** (home screen) can reset every game to level 1 or reset the stars.
 

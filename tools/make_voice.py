@@ -242,6 +242,46 @@ def sentences() -> list[str]:
           "Pour some more.", "Which holds less?", "Count the cups.", "Count the cups each one holds."]
     for c in ("jug", "bottle", "bucket", "vase"):
         s += [f"The {c} holds more.", f"The {c} holds less."]
+    # fourth batch: level labels
+    s += ["Numbers to 20.", "Numbers to 100.", "Sums.", "Bonds to 10.", "Bonds to 20.", "Missing numbers.",
+          "Count the array.", "Times tables.", "Make an array.", "Days in order.", "Before, after, tomorrow.",
+          "Months and seasons."]
+    # hungry crocodile (croc.js)
+    s += ["Which way does the crocodile face?", "It always eats the bigger number.",
+          "The crocodile always eats the bigger number.", "The crocodile eats the bigger number.",
+          "They are the same, so we use equals.", "Look again.", "Are they the same?"]
+    # cherry bonds (cherry.js)
+    s += ["What is the whole?", "Put the parts together.", "What is the missing part?", "Add the two parts together.",
+          "Count on from the part you know.", "What is the missing number?", "Use the cherry to help.",
+          "Find the whole and the two parts.", "The number sentence is true."]
+    for w in range(3, 21):
+        lo, hi = (0, w) if w <= 10 else (1, w - 1)
+        s += [f"{a} and {w - a} make {w}." for a in range(lo, hi + 1)]
+    # flower arrays (arrays.js)
+    for c in (2, 5, 10):
+        s += [f"Count in {c}s, one row at a time."]
+        for r in range(2, 7):
+            s += [f"There are {r} rows of {c}.", f"What is {r} times {c}?", f"{r} times {c} is {r * c}."]
+    s += ["How many flowers altogether?", "Change the rows and how many in each row.", "Not enough flowers yet.",
+          "Too many flowers!", "That's right, but try making more than one row."]
+    for n in (6, 8, 10, 12, 15, 16, 18, 20):
+        s.append(f"Make an array with {n} flowers.")
+    s += [f"{r} rows of {c} is {r * c}." for r in range(1, 11) for c in range(1, 11)]
+    # calendar caterpillar (calendar.js)
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    seasons = ["winter", "winter", "spring", "spring", "spring", "summer", "summer", "summer", "autumn", "autumn", "autumn", "winter"]
+    s += ["Which day is missing from the caterpillar?", "Which day is missing?", "Tomorrow is the next day.",
+          "Yesterday was the day before."]
+    for i, d in enumerate(days):
+        nxt, prv = days[(i + 1) % 7], days[(i + 6) % 7]
+        s += [f"That's {d}.", f"What day comes after {d}?", f"What day comes before {d}?",
+              f"{nxt} comes after {d}.", f"{prv} comes before {d}.", f"If today is {d}, what day is tomorrow?",
+              f"If today is {d}, what day is yesterday?", f"Tomorrow is {d}.", f"Yesterday was {d}."]
+    for i, m in enumerate(months):
+        s += [f"That's {m}.", f"What month comes after {m}?", f"{months[(i + 1) % 12]} comes after {m}.",
+              f"Which season is {m} in?", f"{m} is in {seasons[i]}."]
+    s += [f"That's {x}." for x in ("spring", "summer", "autumn", "winter")]
     return s
 
 
