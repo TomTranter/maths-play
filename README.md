@@ -22,6 +22,14 @@ It is a self-contained web app: plain HTML, CSS and JavaScript, no build step, n
 | Party Bags | Sharing sweets into bags, filling bags equally, counting bags in 2s, 5s, 10s | Y1 grouping and sharing; Y2 2, 5, 10 times tables |
 | Balance Scales | Heavier/lighter on a scale; making both sides equal (8 + 5 = 10 + ?) | Y1 compare mass; = sign and missing numbers |
 | Shape Hunt | Finding every shape of a kind; sides, corners and "What am I?" riddles | Y1 name 2D shapes; Y2 sides and corners |
+| Robot Route | Programming a robot with forward/turn arrows to reach a star, round rocks | Y1/Y2 position, direction, quarter and half turns |
+| Measure It | Longer/shorter snakes; measuring with cubes; reading a cm ruler (not always from 0) | Y1 compare and measure length; Y2 cm with a ruler |
+| Ladybird Doubles | Copying spots to the other wing; doubles and halves; pairing socks for odd/even | Y1/Y2 doubling and halving; odd and even |
+| Farm Count | Counting animals into a tally chart or pictogram, then reading it | Y2 tally charts, pictograms, comparing totals |
+| Pattern Train | What comes next: colour, shape and number patterns (up/down in 1s, 2s, 5s, 10s) | Y2 patterns and sequences; counting in steps |
+| Full or Empty | Spotting full/half full/empty, pouring to a level, which container holds more | Y1 capacity and volume; Y2 compare capacity |
+
+Each game's level button opens a level list. **Grown-ups** (home screen) can reset every game to level 1 or reset the stars.
 
 Each game has levels. Four correct answers move up a level; tap the level button to change it by hand.
 A right answer scores 2 stars (1 after a mistake). Progress and stars are kept in the browser (`localStorage`).

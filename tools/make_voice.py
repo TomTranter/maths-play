@@ -183,6 +183,65 @@ def sentences() -> list[str]:
     s += ["I am round and I have no corners.", "What am I?", "I have 3 sides and 3 corners.",
           "I have 4 sides that are all the same length.", "I have 4 sides.", "2 are long and 2 are short.",
           "I have 5 sides and 5 corners.", "I have 6 sides and 6 corners."]
+    # level labels for the third batch of games
+    s += ["Straight ahead.", "Left and right turns.", "Round the rocks.", "Longer, shorter.", "Measure with cubes.",
+          "Use a ruler.", "Copy the spots.", "Doubles and halves.", "Odd or even.", "Tally chart.", "Pictogram.",
+          "Compare.", "Colour patterns.", "Shape patterns.", "Number patterns.", "Full, half full, empty.",
+          "Fill it up.", "Which holds more?"]
+    # robot route (robot.js)
+    s += ["Help the robot get to the star.", "Tap forward, then press Go.", "Use forward and turns, then press Go.",
+          "Get to the star.", "Go round the rocks with quarter turns.", "Add some steps first.",
+          "Oops! The robot hit a rock.", "Oops! The robot hit a wall.", "Try again.", "Not there yet.",
+          "The robot found the star."]
+    # measure it (measure.js)
+    for word in ("longer", "shorter"):
+        s.append(f"Which snake is {word}?")
+        s += [f"The {c} snake is {word}." for c in ("red", "blue", "green", "yellow", "purple")]
+    for word in ("longest", "shortest"):
+        s.append(f"Which snake is the {word}?")
+        s += [f"The {c} snake is the {word}." for c in ("red", "blue", "green", "yellow", "purple")]
+    s += ["Look at where each snake ends.", "Count the cubes.", "Count the cubes again.", "Use the ruler.",
+          "It doesn't start at 0.", "Count the centimetres from where it starts.", "Look where it starts and where it ends."]
+    for obj in ("pencil", "worm", "crayon", "train"):
+        s.append(f"How long is the {obj}?")
+        s += [f"The {obj} is {n} cubes long." for n in range(3, 11)]
+        s += [f"The {obj} is {n} centimetres long." for n in range(2, 13)]
+    # ladybird doubles (doubles.js)
+    s += ["Give the other wing the same spots.", "Tap the wing to add a spot.", "Count the spots on each wing.",
+          "Too many spots!", "Tap a spot to take it off.", "Count the spots on one wing.", "Count all the spots.",
+          "How many on each wing?", "Is it odd or even?", "Tap a sock to hang it up.",
+          "One sock is left over.", "Every sock has a partner.", "Look at the last sock.", "Does it have a partner?"]
+    for n in range(1, 11):
+        s += [f"What is double {n}?", f"Double {n} is {2 * n}.", f"Both wings have {n}.",
+              f"This ladybird has {2 * n} spots.", f"Half of {2 * n} is {n}."]
+    for n in range(3, 17):
+        s += [f"Pair up the {n} socks.", f"Is {n} odd or even?", f"{n} is {'odd' if n % 2 else 'even'}."]
+    # farm count (farm.js)
+    s += ["Tap each animal to count it.", "Now look at the chart.", "Look at the chart again.",
+          "Which animal is there most of?", "Which animal is there fewest of?", "Which row is the longest?",
+          "Which row is the shortest?", "Count how many more are in the longer row.", "Add up all the rows.",
+          "How many animals altogether?"]
+    plurals = ("cows", "sheep", "pigs", "hens")
+    for pl in plurals:
+        s += [f"How many {pl} are there?", f"There are the most {pl}.", f"There are the fewest {pl}."]
+        s += [f"There are {n} {pl}." for n in range(2, 9)]
+        for pl2 in plurals:
+            if pl2 != pl:
+                s.append(f"How many more {pl} than {pl2}?")
+                s += [f"There are {d} more {pl} than {pl2}." for d in range(1, 7)]
+    s += [f"There are {n} animals altogether." for n in range(6, 31)]
+    # pattern train (pattern.js)
+    s += ["Look at the pattern.", "The pattern goes on.", "Say the pattern out loud.", "Look at how much it changes each time."]
+    for step in ("ones", "2s", "5s", "10s"):
+        s += [f"It goes up in {step}.", f"It goes down in {step}."]
+    # full or empty (capacity.js)
+    states = ("full", "nearly full", "half full", "nearly empty", "empty")
+    for st in states:
+        s += [f"Which glass is {st}?", f"That glass is {st}.", f"Make the glass {st}.", f"The glass is {st}."]
+    s += ["Tap pour or tip out.", "Look at how much water is in each glass.", "Too much! Tip some out.",
+          "Pour some more.", "Which holds less?", "Count the cups.", "Count the cups each one holds."]
+    for c in ("jug", "bottle", "bucket", "vase"):
+        s += [f"The {c} holds more.", f"The {c} holds less."]
     return s
 
 
@@ -224,7 +283,10 @@ def main() -> None:
     for k, words in STEPS.items():
         clips[k] = (words, SPEED_FRAGMENT)
     for text in sentences():
-        clips[key(text)] = (text, SPEED_SENTENCE)  # whole sentences win over same-key fragments
+        # the app looks up each sentence of a line separately ("Too much! Tip some out." is two)
+        for part in re.findall(r"[^.!?]+[.!?]*", text):
+            if key(part):
+                clips[key(part)] = (part.strip(), SPEED_SENTENCE)  # whole sentences win over same-key fragments
 
     if "--count" in sys.argv:
         print(len(clips), "clips")
