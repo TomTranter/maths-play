@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Which 5?</title>
+<style>
+@font-face { font-family: "Baloo 2"; src: url("../fonts/baloo2-latin.woff2") format("woff2"); font-weight: 400 800; }
+body { margin: 0; padding: 20px 16px 40px; background: linear-gradient(#5fb8ec, #d4f0ff) fixed; color: #1d3557; font-family: "Baloo 2", system-ui, sans-serif; }
+h1 { margin: 0; color: #fff; text-shadow: 0 4px 0 #1d3557; font-size: 2.4rem; }
+.lead { font-weight: 600; max-width: 60ch; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 14px; }
+.card { background: #fff; border-radius: 20px; padding: 12px 16px; box-shadow: 0 6px 0 rgba(29,53,87,.18); }
+.card h2 { margin: 0; font-size: 1.4rem; } .card p { margin: 0 0 6px; color: #4a6080; font-weight: 600; }
+ol { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+button { width: 100%; text-align: left; font: inherit; font-weight: 800; border: 0; border-radius: 12px; background: #eef7fd; padding: 8px 12px; cursor: pointer; color: inherit; }
+button.playing { background: #2a9d4b; color: #fff; }
+</style></head><body>
+<h1>Which 5 sounds best?</h1>
+<p class="lead">Tap each line to hear it. Tell Claude which letter sounds most natural, and every number will be re-recorded that way.</p>
+<div class="grid"><section class="card"><h2>A: current</h2><p>What the app uses now</p><ol><li><button data-f="five/a0.mp3">5</button></li><li><button data-f="five/a1.mp3">Make 5</button></li><li><button data-f="five/a2.mp3">Count in fives. 5, 10, 15.</button></li></ol></section>
+<section class="card"><h2>B: word with full stop</h2><p>Written as &quot;five.&quot; so it ends like a sentence</p><ol><li><button data-f="five/b0.mp3">5</button></li><li><button data-f="five/b1.mp3">Make 5</button></li><li><button data-f="five/b2.mp3">Count in fives. 5, 10, 15.</button></li></ol></section>
+<section class="card"><h2>C: steadier</h2><p>&quot;five.&quot; with less random variation</p><ol><li><button data-f="five/c0.mp3">5</button></li><li><button data-f="five/c1.mp3">Make 5</button></li><li><button data-f="five/c2.mp3">Count in fives. 5, 10, 15.</button></li></ol></section>
+<section class="card"><h2>D: steadiest</h2><p>&quot;five.&quot; with very little variation</p><ol><li><button data-f="five/d0.mp3">5</button></li><li><button data-f="five/d1.mp3">Make 5</button></li><li><button data-f="five/d2.mp3">Count in fives. 5, 10, 15.</button></li></ol></section>
+<section class="card"><h2>E: steady and slower</h2><p>Like C, a little slower</p><ol><li><button data-f="five/e0.mp3">5</button></li><li><button data-f="five/e1.mp3">Make 5</button></li><li><button data-f="five/e2.mp3">Count in fives. 5, 10, 15.</button></li></ol></section></div>
+<script>
+let a = null;
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (a) a.pause();
+  document.querySelectorAll(".playing").forEach((x) => x.classList.remove("playing"));
+  b.classList.add("playing");
+  a = new Audio(b.dataset.f); a.onended = () => b.classList.remove("playing"); a.play();
+});
+</script></body></html>
