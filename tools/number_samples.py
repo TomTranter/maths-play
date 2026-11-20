@@ -35,26 +35,66 @@ VARIANTS = [
     ("b", "B", "Words with a full stop", True, 1.0, None, None),
     ("c", "C", "Words, steadier", True, 1.0, 0.4, 0.5),
     ("d", "D", "Words, steadiest", True, 1.0, 0.2, 0.3),
+    ("e", "E", "Improved: best of 5 takes, endings kept", True, 1.0, 0.4, 0.5),
 ]
+TAKES = 5
 
 
-def render(voice, text, ls, ns, nw):
+def synth(voice, text, ls, ns, nw):
     ch = list(voice.synthesize(text, syn_config=SynthesisConfig(length_scale=ls, noise_scale=ns, noise_w_scale=nw)))
-    rate = ch[0].sample_rate
-    pcm = np.frombuffer(b"".join(c.audio_int16_bytes for c in ch), dtype="<i2")
+    return np.frombuffer(b"".join(c.audio_int16_bytes for c in ch), dtype="<i2").astype(np.float32), ch[0].sample_rate
+
+
+def trim_old(pcm, rate):
     loud = np.flatnonzero(np.abs(pcm) > 400)
-    pcm = pcm[max(0, loud[0] - int(0.02 * rate)): loud[-1] + int(0.06 * rate)]
+    return pcm[max(0, loud[0] - int(0.02 * rate)): loud[-1] + int(0.06 * rate)]
+
+
+def trim_gentle(pcm, rate):
+    """Keep quiet word endings ("v", "s", "th"): cut at a low threshold, keep a longer tail, fade both ends."""
+    quiet = np.flatnonzero(np.abs(pcm) > 120)
+    pcm = pcm[max(0, quiet[0] - int(0.03 * rate)): min(len(pcm), quiet[-1] + int(0.12 * rate))].copy()
+    fi, fo = int(0.01 * rate), int(0.04 * rate)
+    pcm[:fi] *= np.linspace(0, 1, fi)
+    pcm[-fo:] *= np.linspace(1, 0, fo)
+    return pcm
+
+
+def spoken_length(pcm, rate):
+    loud = np.flatnonzero(np.abs(pcm) > 400)
+    return (loud[-1] - loud[0]) / rate if len(loud) else 0
+
+
+def best_take(voice, text, ls, ns, nw):
+    """Render several takes and keep the one with the most typical length (drops stretched or clipped takes)."""
+    takes = [synth(voice, text, ls, ns, nw) for _ in range(TAKES)]
+    lengths = [spoken_length(p, r) for p, r in takes]
+    mid = float(np.median(lengths))
+    return takes[int(np.argmin([abs(x - mid) for x in lengths]))]
+
+
+def to_mp3(pcm, rate):
     enc = lameenc.Encoder(); enc.set_bit_rate(40); enc.set_in_sample_rate(rate); enc.set_channels(1); enc.set_quality(2)
-    return enc.encode(pcm.astype("<i2").tobytes()) + enc.flush()
+    return enc.encode(np.clip(pcm, -32768, 32767).astype("<i2").tobytes()) + enc.flush()
 
 
 def main():
+    import sys
+    only = sys.argv[1:]  # e.g. "e" to render just that version
     voice = PiperVoice.load(MODEL)
     for vid, _, _, as_words, ls, ns, nw in VARIANTS:
+        if only and vid not in only:
+            continue
         (OUT / vid).mkdir(parents=True, exist_ok=True)
         for n in range(101):
             text = f"{words(n)}." if as_words else str(n)
-            (OUT / vid / f"{n}.mp3").write_bytes(render(voice, text, ls, ns, nw))
+            if vid == "e":
+                pcm, rate = best_take(voice, text, ls, ns, nw)
+                pcm = trim_gentle(pcm, rate)
+            else:
+                pcm, rate = synth(voice, text, ls, ns, nw)
+                pcm = trim_old(pcm, rate)
+            (OUT / vid / f"{n}.mp3").write_bytes(to_mp3(pcm, rate))
         print("done", vid, flush=True)
     tabs = "".join(f'<button class="tab{" on" if i == 0 else ""}" data-v="{v[0]}"><b>{v[1]}</b><small>{v[2]}</small></button>' for i, v in enumerate(VARIANTS))
     (ROOT / "samples" / "numbers.html").write_text(PAGE.replace("{tabs}", tabs))

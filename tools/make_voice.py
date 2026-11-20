@@ -303,13 +303,47 @@ def trim(pcm: np.ndarray, rate: int) -> np.ndarray:
     return pcm[max(0, loud[0] - int(0.02 * rate)): min(len(pcm), loud[-1] + int(0.06 * rate))]
 
 
+def trim_gentle(pcm: np.ndarray, rate: int) -> np.ndarray:
+    """Like trim(), but keeps quiet word endings ("v", "s", "th") and fades the edges to avoid clicks."""
+    quiet = np.flatnonzero(np.abs(pcm) > 120)
+    if not len(quiet):
+        return pcm
+    out = pcm[max(0, quiet[0] - int(0.03 * rate)): min(len(pcm), quiet[-1] + int(0.12 * rate))].astype(np.float32)
+    fi, fo = int(0.01 * rate), int(0.04 * rate)
+    out[:fi] *= np.linspace(0, 1, fi)
+    out[-fo:] *= np.linspace(1, 0, fo)
+    return out
+
+
+def spoken_length(pcm: np.ndarray, rate: int) -> float:
+    loud = np.flatnonzero(np.abs(pcm) > 400)
+    return (loud[-1] - loud[0]) / rate if len(loud) else 0.0
+
+
+# Numbers Tom heard as odd in the first recording; they get extra takes to choose from.
+MARKED = {"4", "12", "17", "25", "28", "38", "48", "54", "64", "65", "70", "88", "95", "98"}
+NUMBER_KEY = re.compile(r"^\d+[ps]?$")
+
+
+def best_take(voice, text: str, speed: float, takes: int):
+    """Cori sometimes drags out or clips a word at random. Render several takes and keep the one
+    with the most typical spoken length."""
+    renders = []
+    for _ in range(takes):
+        ch = list(voice.synthesize(text, syn_config=SynthesisConfig(length_scale=speed)))
+        renders.append((np.frombuffer(b"".join(c.audio_int16_bytes for c in ch), dtype="<i2"), ch[0].sample_rate))
+    lengths = [spoken_length(p, r) for p, r in renders]
+    mid = float(np.median(lengths))
+    return renders[int(np.argmin([abs(x - mid) for x in lengths]))]
+
+
 def to_mp3(pcm: np.ndarray, rate: int) -> bytes:
     enc = lameenc.Encoder()
     enc.set_bit_rate(BITRATE)
     enc.set_in_sample_rate(rate)
     enc.set_channels(1)
     enc.set_quality(2)
-    return enc.encode(pcm.astype("<i2").tobytes()) + enc.flush()
+    return enc.encode(np.clip(pcm, -32768, 32767).astype("<i2").tobytes()) + enc.flush()
 
 
 def main() -> None:
@@ -337,16 +371,23 @@ def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     manifest: dict[str, str] = {}
     total = 0
+    redo_numbers = "--redo-numbers" in sys.argv
     for i, (k, (text, speed)) in enumerate(clips.items()):
         name = filename(k)
-        if (OUT / name).exists():  # resumable: keep clips already recorded
+        is_number = bool(NUMBER_KEY.match(k)) or k in STEPS
+        if (OUT / name).exists() and not (redo_numbers and is_number):  # resumable: keep clips already recorded
             manifest[k] = name
             total += (OUT / name).stat().st_size
             continue
         spoken = re.sub(r"\b(2|5|10)s\b", lambda m: STEPS[m.group(0)], text)  # "Count in 5s" -> "fives"
-        chunks = list(voice.synthesize(spoken, syn_config=SynthesisConfig(length_scale=speed)))
-        rate = chunks[0].sample_rate
-        pcm = trim(np.frombuffer(b"".join(c.audio_int16_bytes for c in chunks), dtype="<i2"), rate)
+        if is_number:
+            # bare numbers are heard most often and on their own, so take extra care with them
+            raw, rate = best_take(voice, spoken, speed, 9 if k.rstrip("p") in MARKED else 5)
+            pcm = trim_gentle(raw, rate)
+        else:
+            chunks = list(voice.synthesize(spoken, syn_config=SynthesisConfig(length_scale=speed)))
+            rate = chunks[0].sample_rate
+            pcm = trim_gentle(np.frombuffer(b"".join(c.audio_int16_bytes for c in chunks), dtype="<i2"), rate)
         data = to_mp3(pcm, rate)
         (OUT / name).write_bytes(data)
         manifest[k] = name

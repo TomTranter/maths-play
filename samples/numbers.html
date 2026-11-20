@@ -19,12 +19,12 @@ h1 { margin: 0; color: #fff; text-shadow: 0 4px 0 #1d3557; font-size: 2.2rem; }
 </style></head><body>
 <h1>Numbers 0–100</h1>
 <p class="lead">Choose a version, then tap numbers to hear them. Long-press (or right-click) a number to mark one that sounds odd.
-Tell Claude which version is best, and any marked numbers.</p>
-<div class="tabs"><button class="tab on" data-v="a"><b>A</b><small>What the app uses now (digits)</small></button><button class="tab" data-v="b"><b>B</b><small>Words with a full stop</small></button><button class="tab" data-v="c"><b>C</b><small>Words, steadier</small></button><button class="tab" data-v="d"><b>D</b><small>Words, steadiest</small></button></div>
+F is what the app now uses. Mark any number that still sounds odd and tell Claude.</p>
+<div class="tabs"><button class="tab on" data-v="f"><b>F</b><small>New: A improved (in the app now)</small></button><button class="tab" data-v="a"><b>A</b><small>Old recording, for comparison</small></button></div>
 <div class="grid" id="grid"></div>
 <p class="tip" id="flags"></p>
 <script>
-let v = "a", audio = null;
+let v = "f", audio = null;
 const grid = document.getElementById("grid"), flags = new Set();
 grid.innerHTML = Array.from({ length: 101 }, (_, n) => `<button class="n${n === 0 ? " zero" : ""}" data-n="${n}">${n}</button>`).join("");
 document.querySelectorAll(".tab").forEach((t) => t.onclick = () => {
