@@ -344,6 +344,21 @@ button:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
 .voice small { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
 .voice.on { border-color: var(--good); background: #e6f6ea; }
 .panel .done { align-self: center; height: 60px; font-size: 1.5rem; }
+.panel .version { text-align: center; font-size: 0.85rem; }
+.panel .cancel { align-self: center; height: 56px; box-shadow: 0 4px 0 var(--lift); border: 2px solid var(--sky-low); }
+.entered { display: flex; justify-content: center; gap: 12px; }
+.entered i { width: 18px; height: 18px; border-radius: 50%; border: 3px solid var(--muted); }
+.entered i.on { background: var(--ink); border-color: var(--ink); }
+.keypad { display: grid; grid-template-columns: repeat(3, 72px); gap: 10px; justify-content: center; }
+.keypad button {
+  height: 64px; border: 0; border-radius: 16px; background: var(--sky-low);
+  font-size: 1.8rem; font-weight: 800; box-shadow: 0 4px 0 var(--lift);
+}
+.keypad button:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--lift); }
+.grownups { height: 48px; font-size: 1.05rem; padding: 0 18px; box-shadow: 0 4px 0 var(--grass-dark); }
+/* Hold-to-open on the speaker: stop iPad treating the press as a selection/drag gesture. */
+#soundBtn { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+#soundBtn svg { pointer-events: none; }
 
 /* ---------- effects ---------- */
 .flyer, .plus { position: fixed; left: 0; top: 0; z-index: 6; pointer-events: none; font-weight: 800; font-size: 2.6rem; line-height: 1; color: var(--ink); }

@@ -3,6 +3,7 @@
 // are shared with the game scripts that load after it.
 "use strict";
 
+const APP_VERSION = "1.3"; // shown in the grown-ups panel, to check a tablet has the latest update
 const STORE_KEY = "balloon-pop-maths"; // original key, so existing scores carry over
 const ROUNDS_PER_LEVEL = 4;
 const COLORS = [
@@ -297,7 +298,9 @@ function renderControls() {
 function showHome() {
   $("homeBtn").hidden = true;
   $("say").hidden = true;
-  $("ground").replaceChildren();
+  const grown = h('<button class="soft grownups">Grown-ups</button>');
+  grown.onclick = () => openGrownups(); // defined in main.js
+  $("ground").replaceChildren(grown);
   const home = h(`<div class="home"><h1>Number Garden</h1><div class="tiles"></div></div>`);
   for (const g of Object.values(GAMES)) {
     const t = h(`<button class="tile">${g.art}<span></span><small></small></button>`);

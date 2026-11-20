@@ -23,7 +23,7 @@ Each game has levels. Four correct answers move up a level; tap the level button
 A right answer scores 2 stars (1 after a mistake). Progress and stars are kept in the browser (`localStorage`).
 
 **Voice:** the app picks the best English voice on the device (British, and Enhanced/Premium voices first;
-Apple's joke voices are skipped). Grown-ups can choose another by **pressing and holding the speaker button**.
+Apple's joke voices are skipped). Grown-ups can choose another from the **Grown-ups** button on the home screen (or by holding the speaker button for a second); a quick "tap the numbers written as words" check keeps children out.
 On an iPad, nicer voices can be downloaded in *Settings → Accessibility → Spoken Content → Voices → English*.
 
 ## Run it
