@@ -2,21 +2,30 @@
 # requires-python = ">=3.11"
 # dependencies = ["piper-tts==1.8.0", "lameenc==1.9.0", "numpy"]
 # ///
-"""Record the game's spoken lines as short clips in the Poppy voice.
+"""Record everything the games say, in the Cori voice.
 
 Usage:  uv run tools/make_voice.py
-Needs ~/.cache/piper-voices/en_GB-semaine-medium.onnx(.json) from huggingface.co/rhasspy/piper-voices.
-Writes audio/poppy/*.mp3 and audio/poppy/manifest.json ({clip key: file}).
+Needs ~/.cache/piper-voices/en_GB-cori-high.onnx(.json) from huggingface.co/rhasspy/piper-voices.
+Writes audio/cori/*.mp3 and audio/cori/manifest.json ({clip key: file}).
 
-At runtime js/core.js splits a sentence into clip keys: runs of words are matched longest-first
-against the phrase keys below; numbers are "#34", pence "#34p", step counts "#5s". Anything without
-a clip falls back to the device voice, so add phrases here when the games learn new lines.
+Two kinds of clip:
+  * whole sentences — every sentence the games can produce, enumerated below to mirror the templates
+    in js/games/*.js, so lines are spoken with natural rhythm;
+  * fragments — phrases, numbers 0–100, pence and "twos/fives/tens", used only to piece together a
+    sentence that has no whole clip (a safety net; the device voice is the last resort).
 
-Voice: "Poppy" from the SEMAINE database (DFKI), CC BY-NC-SA 4.0 — non-commercial use, credit required.
+At runtime js/core.js splits a line into sentences on . ! ? and looks each up by key(); see toClips().
+When a game gets a new or changed spoken line, add it to sentences() (or PHRASES) and re-run.
+
+Voice: Piper "en_GB-cori-high", trained on public-domain LibriVox recordings.
+(Poppy from en_GB-semaine-medium was tried first and sounded too excitable.)
 """
+import hashlib
+import itertools
 import json
 import re
 import shutil
+import sys
 from pathlib import Path
 
 import lameenc
@@ -24,17 +33,11 @@ import numpy as np
 from piper import PiperVoice, SynthesisConfig
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "audio" / "poppy"
-MODEL = Path.home() / ".cache" / "piper-voices" / "en_GB-semaine-medium.onnx"
-SPEAKER = "poppy"
-# Piper length_scale (>1 is slower). Numbers and short fragments are joined into sentences,
-# so they're a little quicker than whole sentences or the result drags.
-SPEED_SENTENCE = 1.05
+OUT = ROOT / "audio" / "cori"
+MODEL = Path.home() / ".cache" / "piper-voices" / "en_GB-cori-high.onnx"
+SPEED_SENTENCE = 1.0  # Piper length_scale; >1 is slower
 SPEED_FRAGMENT = 0.95
-
-
-def speed_for(key: str) -> float:
-    return SPEED_FRAGMENT if key.startswith("#") or len(key.split()) <= 3 else SPEED_SENTENCE
+BITRATE = 40  # kbps, mono speech
 
 PHRASES = [
     # shared
@@ -46,13 +49,13 @@ PHRASES = [
     "Is there a smaller number?", "Is there a bigger number?",
     # sticks & blocks
     "What number is this?", "Count the tens, then the ones.", "Count the sticks first.", "Each stick is ten.",
-    "tens and", "ten and", "ones make", "one make", "ones is", "one is",
+    "tens and", "ten and", "ones", "one", "tens", "ten",
     "Ten ones make one ten!", "Ten blocks!", "Swap them for a stick.",
     # ten frame
-    "Put in", "counters", "How many counters?", "Count again.", "A full row is five.",
+    "Put in", "counters", "counter", "How many counters?", "Count again.", "A full row is five.",
     "How many more to make ten?", "Count the empty spaces.", "make ten",
     # bead rack
-    "Slide", "beads across to the left", "How many beads on the left?", "Each full row is ten.",
+    "Slide", "beads across to the left", "bead across to the left", "How many beads on the left?", "Each full row is ten.",
     # frog hops
     "Tap where the frog lands.", "Hop to the answer!", "Too many hops!", "Count them again.", "Count the hops.",
     # hundred square
@@ -69,13 +72,86 @@ PHRASES = [
 STEPS = {"2s": "twos", "5s": "fives", "10s": "tens"}
 
 
-def key_for(text: str) -> str:
-    """Must match the word-run keys produced by toClips() in js/core.js."""
-    return " ".join(re.findall(r"[a-z']+", text.lower().replace("’", "'")))
+def plural(n: int, one: str, many: str) -> str:
+    return f"{n} {one if n == 1 else many}"
 
 
-def slug(key: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", key.replace("#", "n").replace("'", "")).strip("-")
+def time_label(h: int, m: int) -> str:
+    return {0: f"{h} o'clock", 30: f"half past {h}", 15: f"quarter past {h}"}.get(m, f"quarter to {h % 12 + 1}")
+
+
+def sentences() -> list[str]:
+    """Every numbered sentence the games can say (mirrors js/games/*.js)."""
+    s: list[str] = []
+    # level-up labels (core.js win(): "Level up! <label>.")
+    s += [f"Up to {n}." for n in (10, 20, 50, 99, 100)] + [f"Up to {n}p." for n in (10, 20, 50)]
+    s += ["Add to 10.", "Add to 20.", "Take away.", "Count in 10s.", "Count in 5s.", "Count in 2s.",
+          "1 more, 1 less.", "O'clock.", "Half past.", "Quarter past and to."]
+    # sticks & blocks: "Make N" and "N is T tens and O ones" (blocksLine in blocks.js)
+    for n in range(1, 100):
+        t, o = divmod(n, 10)
+        s.append(f"Make {n}.")
+        parts = [plural(t, "ten", "tens")] if t else []
+        parts += [plural(o, "one", "ones")] if o else []
+        s.append(f"{n} is {' and '.join(parts)}.")
+    # ten frame
+    for n in range(1, 21):
+        s += [f"Put in {plural(n, 'counter', 'counters')}.", f"That's {n}."]
+    s += [f"{n} and {10 - n} make ten." for n in range(1, 10)]
+    # bead rack
+    s += [f"Slide {plural(n, 'bead', 'beads')} across to the left." for n in range(1, 101)]
+    s += [f"Ten and {k} make {10 + k}." for k in range(1, 10)]
+    # frog hops
+    combos = set()
+    for b in range(1, 7):
+        combos |= {("+", a, b) for a in range(0, 10 - b + 1)}
+    for b in range(1, 10):
+        combos |= {("+", a, b) for a in range(4, 20 - b + 1)}
+    for a in range(6, 21):
+        combos |= {("-", a, b) for b in range(1, min(9, a) + 1)}
+    for op, a, b in sorted(combos):
+        word, ans = ("add", a + b) if op == "+" else ("take away", a - b)
+        s += [f"{a} {word} {b}.", f"{a} {word} {b} is {ans}."]
+    # hundred square
+    for step in (10, 5, 2):
+        s.append(f"Count on {step} more.")
+        for k0 in range(1, 100 // step - 5 + 1):
+            seq = [(k0 + j) * step for j in range(6)]
+            s.append(", ".join(map(str, seq[:3])) + ".")
+            s.append(", ".join(map(str, seq)) + ".")
+    for r in range(1, 101):
+        s.append(f"Find {r}.")
+        if r <= 99:
+            s += [f"What is one more than {r}?", f"One more than {r} is {r + 1}."]
+        if r >= 2:
+            s += [f"What is one less than {r}?", f"One less than {r} is {r - 1}."]
+    # coin shop
+    for price in range(3, 51):
+        s += [f"The {item} costs {price}p." for item in ("apple", "lolly", "ball", "toy car")]
+        s += [f"Put {price}p in the purse.", f"That's {price}p."]
+    for coins_, top in (([1, 2, 5], 10), ([1, 2, 5, 10], 20), ([1, 2, 5, 10, 20], 50)):
+        for size in (2, 3, 4):
+            for combo in itertools.combinations_with_replacement(sorted(coins_, reverse=True), size):
+                total = sum(combo)
+                if 3 <= total <= top:
+                    names = [f"{c}p" for c in combo]
+                    s.append(f"{', '.join(names[:-1])} and {names[-1]} make {total}p.")
+    # clock
+    for h in range(1, 13):
+        for m in (0, 15, 30, 45):
+            label = time_label(h, m)
+            s += [f"It's {label}.", f"Make the clock say {label}."]
+    return s
+
+
+def key(text: str) -> str:
+    """Clip key; must match clipKey() in js/core.js."""
+    return " ".join(re.findall(r"\d+[ps]?|[a-z']+", text.lower().replace("’", "'").replace("&", " and ")))
+
+
+def filename(k: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", k.replace("'", "")).strip("-")[:48]
+    return f"{slug}-{hashlib.sha1(k.encode()).hexdigest()[:6]}.mp3"
 
 
 def trim(pcm: np.ndarray, rate: int) -> np.ndarray:
@@ -83,14 +159,12 @@ def trim(pcm: np.ndarray, rate: int) -> np.ndarray:
     loud = np.flatnonzero(np.abs(pcm) > 400)
     if not len(loud):
         return pcm
-    start = max(0, loud[0] - int(0.02 * rate))
-    end = min(len(pcm), loud[-1] + int(0.05 * rate))
-    return pcm[start:end]
+    return pcm[max(0, loud[0] - int(0.02 * rate)): min(len(pcm), loud[-1] + int(0.06 * rate))]
 
 
 def to_mp3(pcm: np.ndarray, rate: int) -> bytes:
     enc = lameenc.Encoder()
-    enc.set_bit_rate(48)
+    enc.set_bit_rate(BITRATE)
     enc.set_in_sample_rate(rate)
     enc.set_channels(1)
     enc.set_quality(2)
@@ -98,35 +172,48 @@ def to_mp3(pcm: np.ndarray, rate: int) -> bytes:
 
 
 def main() -> None:
-    voice = PiperVoice.load(MODEL)
-    speaker = voice.config.speaker_id_map[SPEAKER]
-
-    clips: dict[str, str] = {}  # key -> text to render
+    clips: dict[str, tuple[str, float]] = {}  # key -> (text to render, speed)
     for p in PHRASES:
-        clips.setdefault(key_for(p), p)
+        clips.setdefault(key(p), (p, SPEED_FRAGMENT))
     for n in range(0, 101):
-        clips[f"#{n}"] = str(n)
+        clips[str(n)] = (str(n), SPEED_FRAGMENT)
     for n in range(1, 101):
-        clips[f"#{n}p"] = f"{n}p"
+        clips[f"{n}p"] = (f"{n}p", SPEED_FRAGMENT)
     for k, words in STEPS.items():
-        clips[f"#{k}"] = words
+        clips[k] = (words, SPEED_FRAGMENT)
+    for text in sentences():
+        clips[key(text)] = (text, SPEED_SENTENCE)  # whole sentences win over same-key fragments
 
-    if OUT.exists():
-        shutil.rmtree(OUT)
-    OUT.mkdir(parents=True)
+    if "--count" in sys.argv:
+        print(len(clips), "clips")
+        return
+    voice = PiperVoice.load(MODEL)
+    if "--fresh" in sys.argv and OUT.exists():
+        shutil.rmtree(OUT)  # re-record everything (e.g. after changing voice or speed)
+    OUT.mkdir(parents=True, exist_ok=True)
     manifest: dict[str, str] = {}
     total = 0
-    for key, text in clips.items():
-        cfg = SynthesisConfig(speaker_id=speaker, length_scale=speed_for(key))
-        chunks = list(voice.synthesize(text, syn_config=cfg))
+    for i, (k, (text, speed)) in enumerate(clips.items()):
+        name = filename(k)
+        if (OUT / name).exists():  # resumable: keep clips already recorded
+            manifest[k] = name
+            total += (OUT / name).stat().st_size
+            continue
+        spoken = re.sub(r"\b(2|5|10)s\b", lambda m: STEPS[m.group(0)], text)  # "Count in 5s" -> "fives"
+        chunks = list(voice.synthesize(spoken, syn_config=SynthesisConfig(length_scale=speed)))
         rate = chunks[0].sample_rate
         pcm = trim(np.frombuffer(b"".join(c.audio_int16_bytes for c in chunks), dtype="<i2"), rate)
         data = to_mp3(pcm, rate)
-        name = slug(key) + ".mp3"
         (OUT / name).write_bytes(data)
-        manifest[key] = name
+        manifest[k] = name
         total += len(data)
-    (OUT / "manifest.json").write_text(json.dumps(manifest, indent=0, sort_keys=True))
+        if i % 200 == 0:
+            print(f"{i}/{len(clips)}", flush=True)
+    keep = set(manifest.values()) | {"manifest.json"}
+    for f in OUT.iterdir():  # drop clips for lines that no longer exist
+        if f.name not in keep:
+            f.unlink()
+    (OUT / "manifest.json").write_text(json.dumps(manifest, separators=(",", ":"), sort_keys=True))
     print(f"{len(manifest)} clips, {total / 1e6:.1f} MB")
 
 

@@ -71,13 +71,13 @@ function openVoicePicker() {
   let showAll = false;
   const el = sheet(`
       <h2>Choose a voice</h2>
-      <p class="note">Tap a voice to hear it. <b>Poppy</b> is recorded into the app, so she sounds the same on every
+      <p class="note">Tap a voice to hear it. <b>${RECORDED_NAME}</b> is recorded into the app, so she sounds the same on every
         device and works offline. The others are this device's own voices.</p>
       <div class="voice-list"></div>
       <button class="soft show-all">Show all voices</button>
       <button class="check done">Done</button>
       <p class="note version">Number Garden ${APP_VERSION} · <span class="count"></span></p>
-      <p class="note version">Poppy voice: SEMAINE database (DFKI), CC BY-NC-SA 4.0, made with Piper.</p>`);
+      <p class="note version">${RECORDED_NAME} voice made with Piper from public-domain LibriVox recordings.</p>`);
   const list = el.querySelector(".voice-list");
   const LANG = { "en-GB": "UK", "en-US": "US", "en-AU": "Australia", "en-IE": "Ireland", "en-IN": "India", "en-ZA": "South Africa", "en-NZ": "New Zealand" };
   function render() {
@@ -88,14 +88,15 @@ function openVoicePicker() {
     el.querySelector(".count").textContent = `${allVoices.length} voices on this device, ${voices.length} English`;
     list.replaceChildren();
     const sample = () => say("Hello! Pop the smallest number first!");
-    const poppy = h('<button class="voice"><span>Poppy</span><small>Recorded · UK · works offline</small></button>');
-    poppy.classList.toggle("on", useRecorded());
-    poppy.onclick = () => {
+    const rec = h('<button class="voice"><span></span><small>Recorded · UK · works offline</small></button>');
+    rec.querySelector("span").textContent = RECORDED_NAME;
+    rec.classList.toggle("on", useRecorded());
+    rec.onclick = () => {
       S.voice = RECORDED_VOICE; S.sound = true; save(); renderControls();
-      list.querySelectorAll(".voice").forEach((x) => x.classList.toggle("on", x === poppy));
+      list.querySelectorAll(".voice").forEach((x) => x.classList.toggle("on", x === rec));
       sample();
     };
-    list.append(poppy);
+    list.append(rec);
     for (const v of opts) {
       const b = h('<button class="voice"><span></span><small></small></button>');
       const q = voiceQuality(v), lang = (v.lang || "").replace("_", "-");
@@ -130,8 +131,8 @@ addEventListener("hashchange", show);
   S.mode = saved.mode === "down" ? "down" : "up";
   S.prog = saved.prog && typeof saved.prog === "object" ? saved.prog : {};
   S.voice = typeof saved.voice === "string" ? saved.voice : "";
-  if (saved.voiceV !== 2) S.voice = ""; // v1.7: switch everyone to the recorded Poppy voice once
-  S.voiceV = 2;
+  if (saved.voiceV !== 3) S.voice = ""; // v1.8: switch everyone to the recorded Cori voice once
+  S.voiceV = 3;
   save();
   show();
 })();

@@ -36,7 +36,7 @@ const beads = {
     beads.render();
 
     if (kind === "make") {
-      setInstruction(`Slide <b>${n}</b> beads across`, `Slide ${n} beads across to the left`);
+      setInstruction(`Slide <b>${n}</b> ${n === 1 ? "bead" : "beads"} across`, `Slide ${plural(n, "bead", "beads")} across to the left.`);
       checkRow((btn) => beads.check(btn), () => { t.counts.fill(0); beads.render(); });
     } else {
       setInstruction("How many beads on the left?", "How many beads on the left?");

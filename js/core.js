@@ -3,7 +3,7 @@
 // are shared with the game scripts that load after it.
 "use strict";
 
-const APP_VERSION = "1.7"; // shown in the grown-ups panel, to check a tablet has the latest update
+const APP_VERSION = "1.9"; // shown in the grown-ups panel, to check a tablet has the latest update
 const STORE_KEY = "balloon-pop-maths"; // original key, so existing scores carry over
 const ROUNDS_PER_LEVEL = 4;
 const COLORS = [
@@ -114,35 +114,58 @@ function voiceScore(v) {
 }
 const goodVoices = () => voices.filter((v) => !isNovelty(v)).sort((a, b) => voiceScore(b) - voiceScore(a));
 function pickVoice() {
-  if (S.voice && S.voice !== RECORDED_VOICE) {
+  if (S.voice && !S.voice.startsWith("recorded:")) {
     const v = allVoices.find((x) => voiceKey(x) === S.voice) || allVoices.find((x) => x.name === S.voice);
     if (v) return v;
   }
   return goodVoices()[0] || null;
 }
 
-/* ---- recorded voice (Poppy) ----
-   The default voice is a set of pre-recorded clips (tools/make_voice.py), because iPad Safari only gives
-   web pages its basic voices. A sentence is split into clip keys: numbers ("#34", "#34p", "#5s") and runs
-   of words matched longest-first. If any part has no clip, the whole line falls back to the device voice. */
-const RECORDED_VOICE = "recorded:poppy";
-const CLIP_BASE = "audio/poppy/";
+/* ---- recorded voice (Cori) ----
+   The default voice is pre-recorded (tools/make_voice.py), because iPad Safari only gives web pages its
+   basic voices. A line is split into sentences on . ! ? and each sentence is looked up whole, so it keeps
+   its natural rhythm. A sentence without a whole clip is pieced together from fragments (numbers "34",
+   pence "34p", "5s", and runs of words matched longest-first). If even that fails, the whole line falls
+   back to the device voice. */
+const RECORDED_VOICE = "recorded:cori";
+const RECORDED_NAME = "Cori";
+const CLIP_BASE = "audio/cori/";
 let clipMap = null;
 fetch(CLIP_BASE + "manifest.json").then((r) => r.json()).then((m) => { clipMap = m; }).catch(() => {});
-const useRecorded = () => !S.voice || S.voice === RECORDED_VOICE;
+const useRecorded = () => !S.voice || S.voice.startsWith("recorded:");
+
+// Clip key for a sentence or fragment; must match key() in tools/make_voice.py.
+const clipKey = (s) => (s.toLowerCase().replace(/’/g, "'").replace(/&/g, " and ").match(/\d+[ps]?|[a-z']+/g) || []).join(" ");
 
 function toClips(text) {
   if (!clipMap) return null;
-  const t = text.toLowerCase().replace(/’/g, "'").replace(/&/g, " and ").replace(/([a-z']),\s+(?=[a-z])/g, "$1 ");
-  const toks = t.match(/\d+[ps]?|[a-z']+|[.!?,]/g) || [];
+  const seq = [];
+  for (const sentence of text.match(/[^.!?]+[.!?]*/g) || []) {
+    const k = clipKey(sentence);
+    if (!k) continue;
+    if (clipMap[k]) seq.push({ file: clipMap[k] });
+    else {
+      const parts = fragmentClips(sentence);
+      if (!parts) return null;
+      seq.push(...parts);
+    }
+    seq.push({ pause: 0.3 });
+  }
+  while (seq.length && seq.at(-1).pause) seq.pop(); // no dead air at the end of a line
+  return seq.length ? seq : null;
+}
+
+// Safety net: build one sentence from phrase and number clips.
+function fragmentClips(sentence) {
+  const t = sentence.toLowerCase().replace(/’/g, "'").replace(/&/g, " and ").replace(/([a-z']),\s+(?=[a-z])/g, "$1 ");
+  const toks = t.match(/\d+[ps]?|[a-z']+|,/g) || [];
   const seq = [];
   let i = 0;
   while (i < toks.length) {
     const tk = toks[i];
-    if (/^[.!?]$/.test(tk)) { seq.push({ pause: 0.22 }); i++; continue; }
     if (tk === ",") { seq.push({ pause: 0.12 }); i++; continue; }
     if (/^\d/.test(tk)) {
-      const f = clipMap["#" + tk];
+      const f = clipMap[tk];
       if (!f) return null;
       seq.push({ file: f }); i++; continue;
     }
@@ -156,7 +179,6 @@ function toClips(text) {
     if (e === i) return null;
     i = e;
   }
-  while (seq.length && seq.at(-1).pause) seq.pop(); // no dead air at the end of a line
   return seq;
 }
 

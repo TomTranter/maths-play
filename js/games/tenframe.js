@@ -28,7 +28,7 @@ const tenframe = {
     tenframe.render(true);
 
     if (kind === "make") {
-      setInstruction(`Put in <b>${n}</b> counters`, `Put in ${n} counters`);
+      setInstruction(`Put in <b>${n}</b> ${n === 1 ? "counter" : "counters"}`, `Put in ${plural(n, "counter", "counters")}.`);
       checkRow((btn) => tenframe.check(btn), () => { t.filled.fill(false); tenframe.render(); });
     } else if (kind === "count") {
       setInstruction("How many counters?", "How many counters?");

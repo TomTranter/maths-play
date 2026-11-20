@@ -1,7 +1,7 @@
 // Number Garden service worker: precache everything; network-first so updates show up straight away
 // when online, falling back to the cache offline. Bump CACHE when the ASSETS list changes.
-const CACHE = "number-garden-v2";
-const CLIPS = "audio/poppy/"; // recorded voice; every clip listed in its manifest is cached for offline use
+const CACHE = "number-garden-v4";
+const CLIPS = "audio/cori/"; // recorded voice; every clip listed in its manifest is cached for offline use
 const ASSETS = [
   "./",
   "index.html",
@@ -31,7 +31,11 @@ self.addEventListener("install", (e) => {
     try {
       const manifest = await (await fetch(CLIPS + "manifest.json", { cache: "no-cache" })).json();
       await cache.put(CLIPS + "manifest.json", new Response(JSON.stringify(manifest), { headers: { "Content-Type": "application/json" } }));
-      await cache.addAll([...new Set(Object.values(manifest))].map((f) => CLIPS + f));
+      // ~2,300 small clips: cache in batches so one slow request doesn't stall the lot.
+      const files = [...new Set(Object.values(manifest))].map((f) => CLIPS + f);
+      for (let i = 0; i < files.length; i += 100) {
+        try { await cache.addAll(files.slice(i, i + 100)); } catch {}
+      }
     } catch {} // the app still works without clips: it falls back to the device voice
     await self.skipWaiting();
   })());

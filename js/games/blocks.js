@@ -5,6 +5,13 @@ const stickHTML = (btn) => `<${btn ? "button" : "div"} class="stick" aria-label=
 const MINI_STICK = '<svg viewBox="0 0 12 40" width="12" height="34" aria-hidden="true"><rect x="1" y="1" width="10" height="38" rx="2" fill="#3aa6e8" stroke="#13558a" stroke-width="2"/><path d="M1 8.6h10M1 16.2h10M1 23.8h10M1 31.4h10" stroke="#13558a"/></svg>';
 const MINI_CUBE = '<svg viewBox="0 0 14 14" width="18" height="18" aria-hidden="true"><rect x="1" y="1" width="12" height="12" rx="2" fill="#3aa6e8" stroke="#13558a" stroke-width="2"/></svg>';
 
+// "34 is 3 tens and 4 ones" — always the standard split, however the number was built (recorded as one clip).
+function blocksLine(n) {
+  const t = Math.floor(n / 10), o = n % 10;
+  const parts = [t ? plural(t, "ten", "tens") : "", o ? plural(o, "one", "ones") : ""].filter(Boolean);
+  return `${n} is ${parts.join(" and ")}`;
+}
+
 const blocks = {
   id: "blocks", name: "Sticks & Blocks", strand: "Tens and ones",
   levels: [{ label: "Up to 20", max: 20 }, { label: "Up to 50", max: 50 }, { label: "Up to 99", max: 99 }],
@@ -45,8 +52,7 @@ const blocks = {
       const swapped = (target % 10) * 10 + Math.floor(target / 10);
       t.onWin = () => board.classList.add("reveal");
       choices(target, distractors(target, 1, max, [-10, 10, -1, 1], [swapped]),
-        "Count the sticks first. Each stick is ten.", `Yes! ${target}`,
-        `Yes! ${plural(t.tens, "ten", "tens")} and ${plural(t.ones, "one", "ones")} is ${target}`);
+        "Count the sticks first. Each stick is ten.", `Yes! ${target}`, `Yes! ${blocksLine(target)}.`);
     }
   },
   render(added) {
@@ -85,7 +91,7 @@ const blocks = {
   check(btn) {
     const t = task, total = t.tens * 10 + t.ones;
     if (total === t.target) {
-      win(btn, `Yes! ${t.target}`, `Yes! ${plural(t.tens, "ten", "tens")} and ${plural(t.ones, "one", "ones")} make ${t.target}`);
+      win(btn, `Yes! ${t.target}`, `Yes! ${blocksLine(t.target)}.`);
     } else { shakeEl(t.board); miss(moreOrLess(total, t.target)); }
   },
 };
