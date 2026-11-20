@@ -69,6 +69,35 @@ function boing() { tone(260, 0, 0.18, { vol: 0.2, to: 150 }); tone(200, 0.16, 0.
 function fanfare() { NOTES.forEach((n, i) => tone(n, i * 0.11, i === 3 ? 0.5 : 0.18, { type: "triangle", vol: 0.16 })); }
 
 /* ================= speech ================= */
+// Voice choice: a grown-up can pick one (S.voice); otherwise take the best English voice on the device.
+// Apple ships joke voices (Albert, Bubbles, Zarvox…) that must never be picked automatically.
+// Includes Apple's robotic "Eloquence" voices (Eddy, Flo, Reed, Rocko, Sandy, Shelley, Grandma, Grandpa).
+const NOVELTY_VOICES = /\b(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|good news|hysterical|jester|organ|superstar|trinoids|whisper|wobble|zarvox|fred|junior|ralph|kathy|princess|grandma|grandpa|eddy|flo|reed|rocko|sandy|shelley)\b/i;
+let voices = [];
+function loadVoices() {
+  try { voices = speechSynthesis.getVoices().filter((v) => /^en[-_]/i.test(v.lang)); } catch { voices = []; }
+}
+if ("speechSynthesis" in window) {
+  loadVoices();
+  speechSynthesis.addEventListener?.("voiceschanged", loadVoices);
+}
+function voiceScore(v) {
+  if (NOVELTY_VOICES.test(v.name)) return -100;
+  let s = 0;
+  if (/en[-_]GB/i.test(v.lang)) s += 10;
+  else if (/en[-_](IE|AU|NZ)/i.test(v.lang)) s += 4;
+  if (/premium/i.test(v.name)) s += 8;
+  else if (/enhanced|neural|natural/i.test(v.name)) s += 6;
+  if (/google/i.test(v.name)) s += 2;
+  if (v.localService) s += 1;
+  return s;
+}
+const goodVoices = () => voices.filter((v) => !NOVELTY_VOICES.test(v.name)).sort((a, b) => voiceScore(b) - voiceScore(a));
+function pickVoice() {
+  if (S.voice) { const v = voices.find((x) => x.name === S.voice); if (v) return v; }
+  return goodVoices()[0] || null;
+}
+
 // Speaks a line and resolves when it has finished (or was cut off by a newer line).
 // Fallback timers cover browsers that never fire onend or block speech entirely.
 let currentUtterance = null; // held so Chrome doesn't garbage-collect it and drop onend
@@ -81,7 +110,9 @@ function say(text, delay = 0) {
       try {
         speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(text);
-        u.rate = 0.9; u.pitch = 1.15; u.lang = "en-GB";
+        u.lang = "en-GB";
+        try { const v = pickVoice(); if (v) { u.voice = v; u.lang = v.lang; } } catch {} // never lose speech over a voice
+        u.rate = 0.92; u.pitch = 1; // raised pitch sounds robotic on iPad voices
         u.onend = finish; u.onerror = finish;
         currentUtterance = u;
         speechSynthesis.speak(u);

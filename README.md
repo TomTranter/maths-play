@@ -22,6 +22,10 @@ It is a self-contained web app: plain HTML, CSS and JavaScript, no build step, n
 Each game has levels. Four correct answers move up a level; tap the level button to change it by hand.
 A right answer scores 2 stars (1 after a mistake). Progress and stars are kept in the browser (`localStorage`).
 
+**Voice:** the app picks the best English voice on the device (British, and Enhanced/Premium voices first;
+Apple's joke voices are skipped). Grown-ups can choose another by **pressing and holding the speaker button**.
+On an iPad, nicer voices can be downloaded in *Settings → Accessibility → Spoken Content → Voices → English*.
+
 ## Run it
 
 ```bash
