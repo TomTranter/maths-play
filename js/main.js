@@ -70,11 +70,18 @@ function openVoicePicker() {
   loadVoices();
   let showAll = false;
   const el = sheet(`
-      <h2>Choose a voice</h2>
+      <h2>Grown-ups</h2>
+      <h3>Voice</h3>
       <p class="note">Tap a voice to hear it. <b>${RECORDED_NAME}</b> is recorded into the app, so she sounds the same on every
         device and works offline. The others are this device's own voices.</p>
       <div class="voice-list"></div>
       <button class="soft show-all">Show all voices</button>
+      <h3>Progress</h3>
+      <p class="note">Tap a game's level button to choose its level. To start again:</p>
+      <div class="reset-row">
+        <button class="soft danger" data-reset="levels">Start every game from level 1</button>
+        <button class="soft danger" data-reset="stars">Reset stars to 0</button>
+      </div>
       <button class="check done">Done</button>
       <p class="note version">Number Garden ${APP_VERSION} · <span class="count"></span></p>
       <p class="note version">${RECORDED_NAME} voice made with Piper from public-domain LibriVox recordings.</p>`);
@@ -120,7 +127,43 @@ function openVoicePicker() {
     e.currentTarget.textContent = showAll ? "Show best voices only" : "Show all voices";
     render();
   };
+  // Resets need a second tap within 4 seconds, so a stray tap can't wipe progress.
+  el.querySelectorAll("[data-reset]").forEach((b) => {
+    const label = b.textContent;
+    let armed = 0;
+    b.onclick = () => {
+      if (!armed) {
+        b.textContent = "Tap again to confirm"; b.classList.add("armed");
+        armed = setTimeout(() => { armed = 0; b.textContent = label; b.classList.remove("armed"); }, 4000);
+        return;
+      }
+      clearTimeout(armed); armed = 0; b.classList.remove("armed");
+      if (b.dataset.reset === "levels") S.prog = {};
+      else S.score = 0;
+      save(); renderControls(); chime(1);
+      b.textContent = b.dataset.reset === "levels" ? "Done: all games at level 1" : "Done: stars reset";
+      setTimeout(() => { if (b.isConnected) b.textContent = label; }, 2500);
+    };
+  });
   el.querySelector(".done").onclick = () => { speechSynthesis?.removeEventListener?.("voiceschanged", onChange); el.remove(); };
+}
+
+// Level list for one game: pick any level; it starts fresh from there.
+function openLevelPicker(g) {
+  const p = prog(g.id);
+  const el = sheet(`<h2></h2><p class="note">Choose a level</p><div class="level-list"></div><button class="soft cancel">Close</button>`);
+  el.querySelector("h2").textContent = g.name;
+  const list = el.querySelector(".level-list");
+  g.levels.forEach((L, i) => {
+    const b = h(`<button class="level-btn${i === p.level ? " on" : ""}"><span class="lvl-num">${i + 1}</span><span class="lvl-name"></span></button>`);
+    b.querySelector(".lvl-name").textContent = L.label;
+    b.onclick = () => {
+      p.level = i; p.rounds = 0; save(); el.remove(); click();
+      renderControls(); g.next(true);
+    };
+    list.append(b);
+  });
+  el.querySelector(".cancel").onclick = () => el.remove();
 }
 addEventListener("hashchange", show);
 

@@ -414,6 +414,21 @@ button:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
 .voice.on { border-color: var(--good); background: #e6f6ea; }
 .panel .done { align-self: center; height: 60px; font-size: 1.5rem; }
 .panel .version { text-align: center; font-size: 0.85rem; }
+.panel h3 { margin: 6px 0 0; font-size: 1.2rem; line-height: 1.1; }
+.reset-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.panel .danger { height: 48px; font-size: 1rem; padding: 0 14px; box-shadow: 0 4px 0 var(--lift); border: 2px solid #f3c4d3; }
+.panel .danger.armed { background: var(--pink); color: var(--paper); border-color: var(--pink); }
+.level-list { display: grid; gap: 8px; }
+.level-btn {
+  display: flex; align-items: center; gap: 14px; border: 3px solid var(--sky-low); border-radius: 18px;
+  background: var(--paper); padding: 8px 14px; font-size: 1.4rem; font-weight: 800; text-align: left; min-height: 64px;
+}
+.level-btn.on { border-color: var(--good); background: #e6f6ea; }
+.lvl-num {
+  width: 44px; height: 44px; flex: none; border-radius: 50%; background: var(--sun); box-shadow: 0 3px 0 var(--sun-dark);
+  display: grid; place-items: center; font-size: 1.5rem;
+}
+.chip-lvl { font-size: 0.75rem; font-weight: 600; color: var(--muted); letter-spacing: 0.04em; }
 .panel .show-all { align-self: center; height: 48px; font-size: 1.05rem; box-shadow: 0 4px 0 var(--lift); border: 2px solid var(--sky-low); }
 .panel .cancel { align-self: center; height: 56px; box-shadow: 0 4px 0 var(--lift); border: 2px solid var(--sky-low); }
 .entered { display: flex; justify-content: center; gap: 12px; }

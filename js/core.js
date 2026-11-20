@@ -3,7 +3,7 @@
 // are shared with the game scripts that load after it.
 "use strict";
 
-const APP_VERSION = "2.0"; // shown in the grown-ups panel, to check a tablet has the latest update
+const APP_VERSION = "2.1"; // shown in the grown-ups panel, to check a tablet has the latest update
 const STORE_KEY = "balloon-pop-maths"; // original key, so existing scores carry over
 const ROUNDS_PER_LEVEL = 4;
 const COLORS = [
@@ -438,11 +438,8 @@ function renderControls() {
   const p = prog(g.id);
   if (p.level >= g.levels.length) p.level = 0;
   const dots = Array.from({ length: ROUNDS_PER_LEVEL }, (_, i) => `<i class="${i < p.rounds ? "on" : ""}"></i>`).join("");
-  const chip = h(`<button class="chip" aria-label="Change level"><span>${g.levels[p.level].label}</span><span class="dots">${dots}</span></button>`);
-  chip.onclick = () => {
-    p.level = (p.level + 1) % g.levels.length; p.rounds = 0; save(); renderControls();
-    g.next(true);
-  };
+  const chip = h(`<button class="chip" aria-label="Choose a level"><span class="chip-lvl">Level ${p.level + 1}</span><span>${g.levels[p.level].label}</span><span class="dots">${dots}</span></button>`);
+  chip.onclick = () => { click(); openLevelPicker(g); }; // defined in main.js
   c.append(chip);
   g.extraControls?.(c);
 }
