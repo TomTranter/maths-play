@@ -32,6 +32,10 @@ It is a self-contained web app: plain HTML, CSS and JavaScript, no build step, n
 | Cherry Bonds | Part-whole cherry diagrams; missing parts and missing numbers (? + 3 = 7, 9 − ? = 4) | Y1 number bonds, missing number problems; Y2 inverse |
 | Flower Arrays | Counting arrays in 2s/5s/10s, times tables, building an array for a number | Y2 2, 5 and 10 times tables; commutativity |
 | Calendar Caterpillar | Days in order; before/after/tomorrow/yesterday; months and seasons | Y1 days of the week, months, dates language |
+| Rocket Number Line | Tapping where a number goes on a 0–20 / 0–100 line; reading a marked point | Y1/Y2 number line, estimating |
+| Café Change | Adding two prices; change from 10p/20p; change in pounds | Y2 money: totals and giving change |
+| Read the Scale | Thermometers and measuring jugs marked in 10s, 5s and 2s | Y2 temperature (°C), capacity (ml), reading scales |
+| Butterfly Symmetry | Colouring the other wing as a mirror image; spotting the symmetrical pattern | Y2 vertical line symmetry |
 
 Each game's level button opens a level list. **Grown-ups** (home screen) can reset every game to level 1 or reset the stars.
 

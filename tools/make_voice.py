@@ -282,6 +282,40 @@ def sentences() -> list[str]:
         s += [f"That's {m}.", f"What month comes after {m}?", f"{months[(i + 1) % 12]} comes after {m}.",
               f"Which season is {m} in?", f"{m} is in {seasons[i]}."]
     s += [f"That's {x}." for x in ("spring", "summer", "autumn", "winter")]
+    # fifth batch: level labels
+    s += ["Land it: 0 to 20.", "Land it: 0 to 100.", "Read the line.", "Add two prices.", "Change from 10p and 20p.",
+          "Pounds and change.", "Marks in 10s.", "Marks in 5s.", "Marks in 2s.", "Mirror the wing.",
+          "Bigger, more colours.", "Spot the symmetry."]
+    # rocket number line (rocket.js)
+    s += ["Tap the number line.", "You landed right on it.", "Too far! Go back a bit.", "Not far enough! Go a bit further.",
+          "What number is the rocket on?", "Each small mark is 5.", "Find the nearest ten, then count on in fives."]
+    s += [f"Land the rocket on {n}." for n in range(1, 100)]
+    s += [f"Very close to {n}." for n in range(1, 100)]
+    s += [f"The rocket is on {n}." for n in range(5, 100, 5)]
+    # cafe change (cafe.js)
+    cafe_items = ("cake", "juice", "biscuit", "sandwich", "ice lolly", "banana")
+    s += ["How much altogether?", "Start with the bigger price and count on.", "How much change?"]
+    for item in cafe_items:
+        s += [f"The {item} is {p}p." for p in range(1, 11)]
+        s += [f"The {item} costs {p}p." for p in range(1, 20)]
+        s += [f"The {item} costs {p} {'pound' if p == 1 else 'pounds'}." for p in range(1, 10)]
+    s += [f"{a}p and {b}p is {a + b}p." for a in range(1, 11) for b in range(1, 11)]
+    for paid, pounds in ((10, False), (20, False), (5, True), (10, True)):
+        m = (lambda v: f"{v} {'pound' if v == 1 else 'pounds'}") if pounds else (lambda v: f"{v}p")
+        s.append(f"You pay with {m(paid)}.")
+        for price in range(1, paid):
+            s += [f"Count up from {m(price)} to {m(paid)}.", f"{m(price)} and {m(paid - price)} make {m(paid)}."]
+    # read the scale (scales.js)
+    s += ["What temperature is it?", "How much water is in the jug?"]
+    for step in (10, 5, 2):
+        s += [f"Each mark is {step}.", f"Find the nearest ten, then count on in {step}s."]
+    for v in sorted({*range(0, 101, 2), *range(0, 101, 5)}):
+        s += [f"It's {v} degrees.", f"There are {v} millilitres."]
+    # butterfly symmetry (symmetry.js)
+    s += ["Make the other wing match, like a mirror.", "Tap a square to change its colour.", "Tap the squares to colour them.",
+          "Both wings match.", "Some squares shouldn't be coloured.", "Look at the mirror line.", "Check each row.",
+          "Which pattern is symmetrical?", "Both sides must match.", "That pattern is symmetrical.",
+          "Look at both sides of the mirror line.", "Do they match?"]
     return s
 
 
