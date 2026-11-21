@@ -14,6 +14,7 @@ const ASSETS = [
   "icons/icon-maskable-512.png",
   "js/core.js",
   "js/main.js",
+  "js/selftest.js",
   "js/games/balloons.js",
   "js/games/blocks.js",
   "js/games/tenframe.js",

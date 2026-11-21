@@ -493,23 +493,6 @@ button:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
 .pour-row { display: flex; gap: 12px; }
 .pour { height: 58px; font-size: 1.3rem; box-shadow: 0 5px 0 var(--lift); }
 
-/* ---------- hungry crocodile ---------- */
-.croc { display: flex; align-items: center; justify-content: center; gap: clamp(8px, 3vw, 24px); width: 100%; }
-.cside {
-  display: grid; justify-items: center; gap: 8px; background: var(--paper); border-radius: 24px; padding: 12px 18px;
-  box-shadow: 0 6px 0 var(--lift); min-width: clamp(96px, 28vw, 200px);
-}
-.cnum { font-size: clamp(2.4rem, 10vw, 4.4rem); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.cdots { display: grid; grid-template-columns: repeat(5, 12px); gap: 4px; }
-.cdots i { width: 12px; height: 12px; border-radius: 50%; background: var(--counter); }
-.cgap {
-  width: clamp(64px, 18vw, 120px); aspect-ratio: 1.2; display: grid; place-items: center; border-radius: 20px;
-  border: 4px dashed var(--good); color: var(--good); font-size: 2.4rem; font-weight: 800; background: var(--paper-soft);
-}
-.cgap svg { width: 100%; height: auto; }
-.cgap.snap { border-color: transparent; background: none; animation: bump 0.35s ease-out; }
-.croc-btn svg { width: 80%; height: auto; }
-
 /* ---------- cherry bonds ---------- */
 .cherry { width: min(92vw, 46vh, 420px); }
 .cherry svg { width: 100%; height: auto; display: block; }
@@ -680,3 +663,13 @@ button:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
   .choice { width: 70px; }
   .check { height: 64px; }
 }
+
+/* ---------- self-test panel (?selftest) ---------- */
+.selftest {
+  position: fixed; inset: 12px; z-index: 50; overflow: auto; background: var(--paper); color: var(--ink);
+  border-radius: 18px; padding: 16px 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); font-size: 1rem; line-height: 1.4;
+}
+.selftest h2 { margin: 0 0 8px; }
+.selftest .ok { color: var(--good); }
+.selftest .bad { color: var(--pink); }
+.selftest button { font: inherit; font-weight: 800; border: 0; border-radius: 12px; padding: 8px 18px; background: var(--sky-low); }

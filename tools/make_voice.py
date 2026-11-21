@@ -25,6 +25,7 @@ import itertools
 import json
 import re
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -390,7 +391,10 @@ def main() -> None:
         clips[f"{n}p"] = (f"{n}p", SPEED_FRAGMENT)
     for k, words in STEPS.items():
         clips[k] = (words, SPEED_FRAGMENT)
-    for text in sentences():
+    # Games that declare voiceLines() (see docs/ADDING_A_GAME.md) are read straight from their JS files.
+    collected = json.loads(subprocess.run(["node", str(ROOT / "tools" / "collect_lines.mjs")],
+                                          check=True, capture_output=True, text=True).stdout)
+    for text in sentences() + collected:
         # the app looks up each sentence of a line separately ("Too much! Tip some out." is two)
         for part in re.findall(r"[^.!?]+[.!?]*", text):
             if key(part):

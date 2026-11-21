@@ -18,6 +18,17 @@ const COLORS = [
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const GAMES = {}; // id -> game; insertion order is the home-screen order
 
+// Register a game (see docs/ADDING_A_GAME.md). A game can bring its own styles in `game.css`.
+function addGame(game) {
+  GAMES[game.id] = game;
+  if (game.css) {
+    const style = document.createElement("style");
+    style.dataset.game = game.id;
+    style.textContent = game.css;
+    document.head.append(style);
+  }
+}
+
 const $ = (id) => document.getElementById(id);
 const h = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; };
 const rand = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
@@ -74,65 +85,23 @@ function boing() { tone(260, 0, 0.18, { vol: 0.2, to: 150 }); tone(200, 0.16, 0.
 function fanfare() { NOTES.forEach((n, i) => tone(n, i * 0.11, i === 3 ? 0.5 : 0.18, { type: "triangle", vol: 0.16 })); }
 
 /* ================= speech ================= */
-// Voice choice: a grown-up can pick one (S.voice); otherwise take the best English voice on the device.
-// Apple ships joke voices (Albert, Bubbles, Zarvox…) that must never be picked automatically.
-// Includes Apple's robotic "Eloquence" voices (Eddy, Flo, Reed, Rocko, Sandy, Shelley, Grandma, Grandpa).
+/* Every line is spoken by Cori, a voice pre-recorded into the app (tools/make_voice.py) — iPad Safari only
+   gives web pages its basic voices. A line is split into sentences on . ! ? and each sentence is looked up
+   whole, so it keeps its natural rhythm. A sentence without a whole clip is pieced together from fragments
+   (numbers "34", pence "34p", "5s", and runs of words matched longest-first). Only if that fails does the
+   line fall back to the device's own voice (best British voice; Apple's joke voices are never used). */
 const NOVELTY_VOICES = /\b(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|good news|hysterical|jester|organ|superstar|trinoids|whisper|wobble|zarvox|fred|junior|ralph|kathy|princess|grandma|grandpa|eddy|flo|reed|rocko|sandy|shelley)\b/i;
-// On iPad a downloaded Premium/Enhanced voice can share its name with the basic one ("Daniel" twice),
-// so voices are identified by voiceURI (e.g. com.apple.voice.premium.en-GB.Serena), which also tells the quality.
-let voices = [];      // English voices
-let allVoices = [];   // everything the device reports (for the "show all" list)
-function loadVoices() {
-  try { allVoices = speechSynthesis.getVoices(); } catch { allVoices = []; }
-  voices = allVoices.filter((v) => /^en($|[-_])/i.test(v.lang || ""));
-}
-if ("speechSynthesis" in window) {
-  loadVoices();
-  speechSynthesis.addEventListener?.("voiceschanged", loadVoices);
-}
-const voiceKey = (v) => v.voiceURI || v.name;
-const voiceId = (v) => `${v.voiceURI || ""} ${v.name}`;
-function voiceQuality(v) {
-  const id = voiceId(v);
-  if (NOVELTY_VOICES.test(v.name) || /speech\.synthesis\.voice|eloquence/i.test(id)) return "novelty";
-  if (/premium/i.test(id)) return "Premium";
-  if (/enhanced|neural|natural/i.test(id)) return "Enhanced";
-  return "";
-}
-const isNovelty = (v) => voiceQuality(v) === "novelty";
-function voiceScore(v) {
-  const q = voiceQuality(v);
-  if (q === "novelty") return -100;
-  let s = 0;
-  if (/en[-_]GB/i.test(v.lang)) s += 10;
-  else if (/en[-_](IE|AU|NZ)/i.test(v.lang)) s += 4;
-  if (q === "Premium") s += 8;
-  else if (q === "Enhanced") s += 6;
-  if (/google/i.test(v.name)) s += 2;
-  if (v.localService) s += 1;
-  return s;
-}
-const goodVoices = () => voices.filter((v) => !isNovelty(v)).sort((a, b) => voiceScore(b) - voiceScore(a));
-function pickVoice() {
-  if (S.voice && !S.voice.startsWith("recorded:")) {
-    const v = allVoices.find((x) => voiceKey(x) === S.voice) || allVoices.find((x) => x.name === S.voice);
-    if (v) return v;
-  }
-  return goodVoices()[0] || null;
+function fallbackVoice() {
+  let all = [];
+  try { all = speechSynthesis.getVoices(); } catch {}
+  const score = (v) => (/en[-_]GB/i.test(v.lang) ? 10 : /^en/i.test(v.lang) ? 5 : 0) + (/premium|enhanced/i.test(v.voiceURI || "") ? 3 : 0);
+  return all.filter((v) => /^en/i.test(v.lang || "") && !NOVELTY_VOICES.test(v.name) && !/eloquence|speech\.synthesis\.voice/i.test(v.voiceURI || ""))
+    .sort((a, b) => score(b) - score(a))[0] || null;
 }
 
-/* ---- recorded voice (Cori) ----
-   The default voice is pre-recorded (tools/make_voice.py), because iPad Safari only gives web pages its
-   basic voices. A line is split into sentences on . ! ? and each sentence is looked up whole, so it keeps
-   its natural rhythm. A sentence without a whole clip is pieced together from fragments (numbers "34",
-   pence "34p", "5s", and runs of words matched longest-first). If even that fails, the whole line falls
-   back to the device voice. */
-const RECORDED_VOICE = "recorded:cori";
-const RECORDED_NAME = "Cori";
 const CLIP_BASE = "audio/cori/";
 let clipMap = null;
 fetch(CLIP_BASE + "manifest.json").then((r) => r.json()).then((m) => { clipMap = m; }).catch(() => {});
-const useRecorded = () => !S.voice || S.voice.startsWith("recorded:");
 
 // Clip key for a sentence or fragment; must match key() in tools/make_voice.py.
 const clipKey = (s) => (s.toLowerCase().replace(/’/g, "'").replace(/&/g, " and ").match(/\d+[ps]?|[a-z']+/g) || []).join(" ");
@@ -236,12 +205,10 @@ function say(text, delay = 0) {
   return new Promise((resolve) => {
     if (!text || !S.sound) return resolve();
     setTimeout(async () => {
-      if (useRecorded()) {
-        const seq = toClips(text);
-        if (seq) {
-          try { speechSynthesis.cancel(); } catch {}
-          if (await playClips(seq)) return resolve();
-        }
+      const seq = toClips(text);
+      if (seq) {
+        try { speechSynthesis.cancel(); } catch {}
+        if (await playClips(seq)) return resolve();
       }
       stopClips();
       if (!("speechSynthesis" in window)) return resolve();
@@ -251,7 +218,7 @@ function say(text, delay = 0) {
         speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(text);
         u.lang = "en-GB";
-        try { const v = pickVoice(); if (v) { u.voice = v; u.lang = v.lang; } } catch {} // never lose speech over a voice
+        try { const v = fallbackVoice(); if (v) { u.voice = v; u.lang = v.lang; } } catch {} // never lose speech over a voice
         u.rate = 0.92; u.pitch = 1; // raised pitch sounds robotic on iPad voices
         u.onend = finish; u.onerror = finish;
         currentUtterance = u;
@@ -447,9 +414,7 @@ function renderControls() {
 function showHome() {
   $("homeBtn").hidden = true;
   $("say").hidden = true;
-  const grown = h('<button class="soft grownups">Grown-ups</button>');
-  grown.onclick = () => openGrownups(); // defined in main.js
-  $("ground").replaceChildren(grown);
+  $("ground").replaceChildren();
   const home = h(`<div class="home"><h1>Number Garden</h1><div class="tiles"></div></div>`);
   for (const g of Object.values(GAMES)) {
     const t = h(`<button class="tile">${g.art}<span></span><small></small></button>`);

@@ -1,8 +1,11 @@
 // Hungry Crocodile — comparing numbers with <, > and =. NC Y1: use the language of equal to, more
 // than, less than (fewer), most, least. NC Y2: compare and order numbers from 0 up to 100; use <, > and = signs.
+//
+// This file is the reference example of a self-contained game (see docs/ADDING_A_GAME.md):
+// its look (css), everything it says (voiceLines) and an automatic test (test.answer) all live here.
 "use strict";
 
-// The sign drawn as a crocodile's open jaws. dir: "<" opens right (bigger on the right), ">" opens left.
+// The sign drawn as a crocodile's open jaws. "<" opens right (bigger on the right), ">" opens left.
 function crocSVG(sign) {
   if (sign === "=") return `<svg viewBox="0 0 120 100" aria-hidden="true"><rect x="18" y="30" width="84" height="14" rx="7" fill="#2ec27e" stroke="#0f6b40" stroke-width="4"/><rect x="18" y="56" width="84" height="14" rx="7" fill="#2ec27e" stroke="#0f6b40" stroke-width="4"/></svg>`;
   const flip = sign === ">" ? 'transform="translate(120 0) scale(-1 1)"' : "";
@@ -14,6 +17,7 @@ function crocSVG(sign) {
   </g></svg>`;
 }
 const dotsFor = (n) => n <= 20 ? `<span class="cdots">${'<i></i>'.repeat(n)}</span>` : "";
+const CROC_SIGN_NAMES = { "<": "less than", ">": "greater than", "=": "equals" };
 
 const croc = {
   id: "croc", name: "Hungry Crocodile", strand: "More, less & equal",
@@ -27,6 +31,25 @@ const croc = {
     <g transform="translate(32 18) scale(.5)">${crocSVG("<").replace(/<\/?svg[^>]*>/g, "")}</g>
     <text x="102" y="58" text-anchor="middle" font-size="30" font-weight="800" fill="#1d3557" font-family="Baloo 2, sans-serif">8</text>
   </svg>`,
+
+  css: `
+    .croc { display: flex; align-items: center; justify-content: center; gap: clamp(8px, 3vw, 24px); width: 100%; }
+    .cside {
+      display: grid; justify-items: center; gap: 8px; background: var(--paper); border-radius: 24px; padding: 12px 18px;
+      box-shadow: 0 6px 0 var(--lift); min-width: clamp(96px, 28vw, 200px);
+    }
+    .cnum { font-size: clamp(2.4rem, 10vw, 4.4rem); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .cdots { display: grid; grid-template-columns: repeat(5, 12px); gap: 4px; }
+    .cdots i { width: 12px; height: 12px; border-radius: 50%; background: var(--counter); }
+    .cgap {
+      width: clamp(64px, 18vw, 120px); aspect-ratio: 1.2; display: grid; place-items: center; border-radius: 20px;
+      border: 4px dashed var(--good); color: var(--good); font-size: 2.4rem; font-weight: 800; background: var(--paper-soft);
+    }
+    .cgap svg { width: 100%; height: auto; }
+    .cgap.snap { border-color: transparent; background: none; animation: bump 0.35s ease-out; }
+    .croc-btn svg { width: 80%; height: auto; }
+  `,
+
   next() {
     const L = level(croc);
     const equal = Math.random() < 0.2;
@@ -57,7 +80,7 @@ const croc = {
     setInstruction("Which way does the <b>crocodile</b> face?", "Which way does the crocodile face? It always eats the bigger number.");
     const g = $("ground"); g.innerHTML = "";
     for (const s of ["<", ">", "="]) {
-      const b = h(`<button class="choice croc-btn" aria-label="${s === "<" ? "less than" : s === ">" ? "greater than" : "equals"}">${crocSVG(s)}</button>`);
+      const b = h(`<button class="choice croc-btn" aria-label="${CROC_SIGN_NAMES[s]}">${crocSVG(s)}</button>`);
       b.onclick = () => {
         if (busy) return;
         if (s !== answer) {
@@ -72,5 +95,23 @@ const croc = {
       g.append(b);
     }
   },
+
+  // Every line this game can say. The voice is recorded from this list (tools/make_voice.py).
+  voiceLines() {
+    return [
+      "Which way does the crocodile face? It always eats the bigger number.",
+      "Look again. Are they the same?",
+      "The crocodile always eats the bigger number.",
+      "Yes! They are the same, so we use equals.",
+      "Yes! The crocodile eats the bigger number.",
+    ];
+  },
+
+  // Plays the right answer through the real buttons (used by ?selftest).
+  test: {
+    answer() {
+      document.querySelector(`#ground .choice[aria-label="${CROC_SIGN_NAMES[task.answer]}"]`).click();
+    },
+  },
 };
-GAMES.croc = croc;
+addGame(croc);
