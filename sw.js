@@ -1,6 +1,6 @@
 // Number Garden service worker: precache everything; network-first so updates show up straight away
 // when online, falling back to the cache offline. Bump CACHE when the ASSETS list changes.
-const CACHE = "number-garden-v8";
+const CACHE = "number-garden-v9";
 const CLIPS = "audio/cori/"; // recorded voice; every clip listed in its manifest is cached for offline use
 const ASSETS = [
   "./",
@@ -41,6 +41,16 @@ const ASSETS = [
   "js/games/cafe.js",
   "js/games/scales.js",
   "js/games/symmetry.js",
+  "js/games/bear.js",
+  "js/games/bubbles.js",
+  "js/games/dice.js",
+  "js/games/fractions.js",
+  "js/games/machine.js",
+  "js/games/myday.js",
+  "js/games/race.js",
+  "js/games/sorting.js",
+  "js/games/tenbridge.js",
+  "js/games/words.js",
 ];
 
 self.addEventListener("install", (e) => {

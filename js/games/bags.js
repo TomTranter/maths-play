@@ -112,4 +112,22 @@ const bags = {
     else { wrong.forEach((i) => shakeEl(t.bagEls[i])); miss(`Check every bag has ${t.k}.`); }
   },
 };
+// Plays the right answer through the real controls (used by ?selftest).
+bags.test = {
+  async answer() {
+    const t = task;
+    if (t.kind === "share") {
+      for (let i = 0; i < t.N; i++) { tap(t.pile.querySelector('.sweet:not([style*="hidden"])')); await wait(10); }
+      for (let i = 0; i < 100 && (t.landed || 0) < t.N; i++) await wait(40);
+      await wait(50);
+      return tapChoice(t.k);
+    }
+    if (t.kind === "fill") {
+      if (t.k > 10) throw new Error(`a bag holds 10 but ${t.k} are asked for`);
+      t.bagEls.forEach((bag) => { for (let i = 0; i < t.k; i++) tap(bag); });
+      return tapCheck();
+    }
+    tapChoice(t.N);
+  },
+};
 GAMES.bags = bags;

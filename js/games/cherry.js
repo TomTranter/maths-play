@@ -35,6 +35,7 @@ const cherry = {
     if (L.kind === "bond") {
       const hide = pick(["a", "b", "b", "whole"]);
       const ans = { a, b, whole }[hide];
+      t.answer = ans;
       const v = (k) => (k === hide ? "?" : { a, b, whole }[k]);
       const wrap = h(`<div class="cherry">${cherrySVG(v("whole"), v("a"), v("b"), L.max === 10)}</div>`);
       t.wrap = wrap;
@@ -53,6 +54,7 @@ const cherry = {
       ];
       const [text, miss_] = pick(forms);
       const ans = { a, b, whole }[miss_];
+      t.answer = ans;
       const v = (k) => (k === miss_ ? "?" : { a, b, whole }[k]);
       // the helper cherry hides the same value as the sentence, so it never gives the answer away
       const wrap = h(`<div class="cherry-eq"><div class="eq big">${text.replace("?", '<span class="q">?</span>')}</div><div class="cherry small">${cherrySVG(v("whole"), v("a"), v("b"), false)}</div></div>`);
@@ -66,5 +68,9 @@ const cherry = {
       choices(ans, distractors(ans, 0, 20, [-1, 1, -2, 2, 10]), "Find the whole and the two parts.", text.replace("?", ans), "Yes! The number sentence is true.");
     }
   },
+};
+// Plays the right answer through the real controls (used by ?selftest).
+cherry.test = {
+  answer() { tapChoice(task.answer); },
 };
 GAMES.cherry = cherry;

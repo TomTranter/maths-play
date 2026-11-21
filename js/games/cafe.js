@@ -32,6 +32,7 @@ const cafe = {
     if (L.kind === "add") {
       const [x, y] = shuffle(Object.keys(CAFE_ITEMS)).slice(0, 2);
       const a = rand(1, 10), b = rand(1, 10), s = a + b;
+      task.answer = s;
       $("stage").replaceChildren(h(`<div class="cafe">${cafe.card(x, a)}<span class="cafe-op">+</span>${cafe.card(y, b)}</div>`));
       setInstruction("How much <b>altogether</b>?", `The ${x} is ${a}p. The ${y} is ${b}p. How much altogether?`);
       choices(s, distractors(s, 2, 25, [-1, 1, -2, 2, 10]), "Start with the bigger price and count on.", `${a}p + ${b}p = ${s}p`, `Yes! ${a}p and ${b}p is ${s}p.`, { fmt: (n) => n + "p" });
@@ -40,6 +41,7 @@ const cafe = {
     const pounds = L.pounds;
     const paid = pounds ? pick([5, 10]) : pick([10, 20]);
     const price = rand(1, paid - 1), change = paid - price;
+    task.answer = change; task.pounds = pounds;
     const item = pick(Object.keys(CAFE_ITEMS));
     const coin = pounds
       ? `<div class="note-pay">£${paid}</div>`
@@ -51,5 +53,9 @@ const cafe = {
       `Change: ${money(change, pounds)}`, `Yes! ${moneySay(price, pounds)} and ${moneySay(change, pounds)} make ${moneySay(paid, pounds)}.`,
       { fmt: (n) => money(n, pounds) });
   },
+};
+// Plays the right answer through the real controls (used by ?selftest).
+cafe.test = {
+  answer() { tapChoice(money(task.answer, task.pounds)); },
 };
 GAMES.cafe = cafe;

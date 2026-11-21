@@ -87,4 +87,14 @@ const hundred = {
     }
   },
 };
+// Plays the right answer through the real controls (used by ?selftest).
+hundred.test = {
+  async answer() {
+    const t = task;
+    for (const n of t.step ? t.need : [t.ans]) {
+      if (n < 1 || n > 100) throw new Error(`${n} is not on the hundred square`);
+      tap(t.cell(n)); await wait(20);
+    }
+  },
+};
 GAMES.hundred = hundred;

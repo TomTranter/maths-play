@@ -121,11 +121,13 @@ const farm = {
     const ask = t.L.ask === "compare" ? pick(["more", "total"]) : t.L.ask;
     if (ask === "count") {
       const i = rand(0, kinds.length - 1), pl = ANIMALS[kinds[i]].plural;
+      t.answer = counts[i];
       setInstruction(`How many <b>${pl}</b> are there?`, `Now look at the chart. How many ${pl} are there?`);
       choices(counts[i], distractors(counts[i], 1, 10, [-1, 1, -2, 2]), "Look at the chart again.", `Yes! ${counts[i]} ${pl}`, `Yes! There are ${counts[i]} ${pl}.`);
     } else if (ask === "most") {
       const most = Math.random() < 0.6;
       const v = most ? Math.max(...counts) : Math.min(...counts), k = kinds[counts.indexOf(v)], pl = ANIMALS[k].plural;
+      t.answer = k;
       setInstruction(`Which animal is there <b>${most ? "most" : "fewest"}</b> of?`, `Now look at the chart. Which animal is there ${most ? "most" : "fewest"} of?`);
       const g = $("ground"); g.innerHTML = "";
       const opts = shuffle([k, ...shuffle(kinds.filter((x) => x !== k)).slice(0, 2)]);
@@ -142,13 +144,24 @@ const farm = {
       const order = kinds.map((k, i) => i).sort((a, b) => counts[b] - counts[a]);
       const [a, b] = [order[0], order[rand(1, order.length - 1)]];
       const d = counts[a] - counts[b], pa = ANIMALS[kinds[a]].plural, pb = ANIMALS[kinds[b]].plural;
+      t.answer = d;
       setInstruction(`How many more <b>${pa}</b> than <b>${pb}</b>?`, `Now look at the chart. How many more ${pa} than ${pb}?`);
       choices(d, distractors(d, 1, 8, [-1, 1, 2, -2]), "Count how many more are in the longer row.", `Yes! ${d} more`, `Yes! There are ${d} more ${pa} than ${pb}.`);
     } else {
       const total = counts.reduce((x, y) => x + y, 0);
+      t.answer = total;
       setInstruction("How many animals <b>altogether</b>?", "Now look at the chart. How many animals altogether?");
       choices(total, distractors(total, 3, 30, [-1, 1, -2, 2]), "Add up all the rows.", `Yes! ${total}`, `Yes! There are ${total} animals altogether.`);
     }
+  },
+};
+// Plays the right answer through the real controls (used by ?selftest).
+farm.test = {
+  async answer() {
+    const t = task;
+    for (const a of [...t.field.querySelectorAll(".animal")]) tap(a.querySelector("rect"));
+    for (let i = 0; i < 60 && t.answer === undefined; i++) await wait(40);
+    tapChoice(t.answer);
   },
 };
 GAMES.farm = farm;

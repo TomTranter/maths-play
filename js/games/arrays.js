@@ -74,4 +74,17 @@ const arrays = {
     t.wrap.querySelector('[data-v="c"]').textContent = t.c;
   },
 };
+// Plays the right answer through the real controls (used by ?selftest).
+arrays.test = {
+  answer() {
+    const t = task;
+    if (t.kind !== "make") return tapChoice(t.n);
+    let r = 2;
+    while (r <= 10 && (t.N % r || t.N / r > 10)) r++;
+    if (r > 10) throw new Error(`no array for ${t.N} fits the 10 × 10 limit`);
+    for (let i = 1; i < r; i++) tap(t.wrap.querySelector('[data-d="r+"]'));
+    for (let i = 1; i < t.N / r; i++) tap(t.wrap.querySelector('[data-d="c+"]'));
+    tapCheck();
+  },
+};
 GAMES.arrays = arrays;

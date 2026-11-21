@@ -68,4 +68,17 @@ const tenframe = {
     else { shakeEl(t.wrap); miss(moreOrLess(have, t.n)); }
   },
 };
+// Plays the right answer through the real controls (used by ?selftest).
+tenframe.test = {
+  answer() {
+    const t = task;
+    if (t.kind === "make") {
+      const cells = t.wrap.querySelectorAll(".cell");
+      if (t.n > cells.length) throw new Error(`asks for ${t.n} counters but there are only ${cells.length} spaces`);
+      for (let i = 0; i < t.n; i++) tap(cells[i]);
+      return tapCheck();
+    }
+    tapChoice(t.kind === "count" ? t.n : 10 - t.n);
+  },
+};
 GAMES.tenframe = tenframe;

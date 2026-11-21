@@ -120,4 +120,11 @@ const balloons = {
     }
   },
 };
+// Plays the right answer through the real controls (used by ?selftest).
+balloons.test = {
+  async answer() {
+    await settle();
+    for (const n of task.order) { tap(document.querySelector(`.balloon[aria-label="Balloon ${n}"]`)); await wait(20); }
+  },
+};
 GAMES.balloons = balloons;

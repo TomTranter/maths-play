@@ -63,4 +63,17 @@ const beads = {
     else { shakeEl(t.rack); miss(moreOrLess(have, t.n)); }
   },
 };
+// Plays the right answer through the real controls (used by ?selftest).
+beads.test = {
+  answer() {
+    const t = task;
+    if (t.kind === "read") return tapChoice(t.n);
+    const wires = t.rack.querySelectorAll(".wire");
+    if (t.n > wires.length * 10) throw new Error(`asks for ${t.n} beads but the rack has ${wires.length * 10}`);
+    const full = Math.floor(t.n / 10), rem = t.n % 10;
+    for (let r = 0; r < full; r++) tap(wires[r].children[9]);
+    if (rem) tap(wires[full].children[rem - 1]);
+    tapCheck();
+  },
+};
 GAMES.beads = beads;

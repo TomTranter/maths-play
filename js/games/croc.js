@@ -16,7 +16,7 @@ function crocSVG(sign) {
     <circle cx="30" cy="38" r="7" fill="#fff" stroke="#0f6b40" stroke-width="3"/><circle cx="31" cy="37" r="3" fill="#1d3557"/>
   </g></svg>`;
 }
-const dotsFor = (n) => n <= 20 ? `<span class="cdots">${'<i></i>'.repeat(n)}</span>` : "";
+const crocDots = (n) => n <= 20 ? `<span class="croc-dots">${'<i></i>'.repeat(n)}</span>` : "";
 const CROC_SIGN_NAMES = { "<": "less than", ">": "greater than", "=": "equals" };
 
 const croc = {
@@ -34,19 +34,19 @@ const croc = {
 
   css: `
     .croc { display: flex; align-items: center; justify-content: center; gap: clamp(8px, 3vw, 24px); width: 100%; }
-    .cside {
+    .croc-side {
       display: grid; justify-items: center; gap: 8px; background: var(--paper); border-radius: 24px; padding: 12px 18px;
       box-shadow: 0 6px 0 var(--lift); min-width: clamp(96px, 28vw, 200px);
     }
-    .cnum { font-size: clamp(2.4rem, 10vw, 4.4rem); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .cdots { display: grid; grid-template-columns: repeat(5, 12px); gap: 4px; }
-    .cdots i { width: 12px; height: 12px; border-radius: 50%; background: var(--counter); }
-    .cgap {
+    .croc-num { font-size: clamp(2.4rem, 10vw, 4.4rem); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .croc-dots { display: grid; grid-template-columns: repeat(5, 12px); gap: 4px; }
+    .croc-dots i { width: 12px; height: 12px; border-radius: 50%; background: var(--counter); }
+    .croc-gap {
       width: clamp(64px, 18vw, 120px); aspect-ratio: 1.2; display: grid; place-items: center; border-radius: 20px;
       border: 4px dashed var(--good); color: var(--good); font-size: 2.4rem; font-weight: 800; background: var(--paper-soft);
     }
-    .cgap svg { width: 100%; height: auto; }
-    .cgap.snap { border-color: transparent; background: none; animation: bump 0.35s ease-out; }
+    .croc-gap svg { width: 100%; height: auto; }
+    .croc-gap.snap { border-color: transparent; background: none; animation: bump 0.35s ease-out; }
     .croc-btn svg { width: 80%; height: auto; }
   `,
 
@@ -71,11 +71,11 @@ const croc = {
     const t = newTask({ answer, left, right });
     const showDots = L.kind === "num" && L.max === 20;
     const wrap = h(`<div class="croc">
-      <div class="cside"><span class="cnum">${left}</span>${showDots ? dotsFor(lv) : ""}</div>
-      <div class="cgap">?</div>
-      <div class="cside"><span class="cnum">${right}</span>${showDots ? dotsFor(rv) : ""}</div>
+      <div class="croc-side"><span class="croc-num">${left}</span>${showDots ? crocDots(lv) : ""}</div>
+      <div class="croc-gap">?</div>
+      <div class="croc-side"><span class="croc-num">${right}</span>${showDots ? crocDots(rv) : ""}</div>
     </div>`);
-    t.gap = wrap.querySelector(".cgap");
+    t.gap = wrap.querySelector(".croc-gap");
     $("stage").replaceChildren(wrap);
     setInstruction("Which way does the <b>crocodile</b> face?", "Which way does the crocodile face? It always eats the bigger number.");
     const g = $("ground"); g.innerHTML = "";

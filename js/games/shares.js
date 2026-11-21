@@ -60,6 +60,7 @@ const shares = {
       const row = h('<div class="share-cards"></div>');
       cards.forEach((c) => {
         const b = h(`<button class="share-card" aria-label="${c.kind}">${shareSVG(c.kind, c.cuts)}</button>`);
+        if (c.ok) t.good = b;
         b.onclick = () => {
           if (busy) return;
           if (c.ok) {
@@ -106,6 +107,15 @@ const shares = {
     const t = task, n = t.on.size;
     if (n === t.need) win(btn, t.target === 2 ? "Yes! Half" : "Yes! A quarter", t.target === 2 ? "Yes! That's half." : "Yes! That's a quarter.");
     else { shakeEl(t.big); miss(n < t.need ? "Colour some more." : "Too much! Tap one to take it off."); }
+  },
+};
+// Plays the right answer through the real controls (used by ?selftest).
+shares.test = {
+  answer() {
+    const t = task;
+    if (t.kind === "pick") return tap(t.good);
+    for (let i = 0; i < t.need; i++) tap(task.big.querySelectorAll(".part")[i]);
+    tapCheck();
   },
 };
 GAMES.shares = shares;

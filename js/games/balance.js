@@ -145,4 +145,13 @@ const balance = {
     }, 900);
   },
 };
+// Plays the right answer through the real controls (used by ?selftest).
+balance.test = {
+  async answer() {
+    const t = task;
+    await wait(650);
+    if (t.kind === "weigh") return tap(t.svg.querySelector(`.obj-hit[data-obj="${t.ask === "heavier" ? t.heavier : t.lighter}"] rect`));
+    tapChoice(t.d);
+  },
+};
 GAMES.balance = balance;

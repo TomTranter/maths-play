@@ -87,6 +87,7 @@ const capacity = {
       do { ca = rand(2, 10); cb = rand(2, 10); } while (Math.abs(ca - cb) < 2);
       const more = Math.random() < 0.6;
       const answer = (ca > cb) === more ? a : b;
+      t.answer = answer;
       const row = h('<div class="containers"></div>');
       [[a, ca], [b, cb]].forEach(([k, n]) => {
         const btn = h(`<button class="container-btn" aria-label="${k}">${containerSVG(k)}<span class="cups">${CUP.repeat(n)}</span><span class="c-name">${k}: ${n} cups</span></button>`);
@@ -116,6 +117,19 @@ const capacity = {
     const ok = STATE_EIGHTHS[t.want];
     if (ok.includes(t.eighths)) win(btn, `Yes! ${t.want}`, `Yes! The glass is ${t.want}.`);
     else { shakeEl(t.glass); miss(t.eighths > Math.max(...ok) ? "Too much! Tip some out." : "Pour some more."); }
+  },
+};
+// Plays the right answer through the real controls (used by ?selftest).
+capacity.test = {
+  answer() {
+    const t = task;
+    if (t.kind === "spot") return tap(document.querySelector(`.glass-btn[aria-label="${t.want}"]`));
+    if (t.kind === "fill") {
+      const target = STATE_EIGHTHS[t.want][0], [tip, pour] = document.querySelectorAll(".pour");
+      for (let i = 0; i < 9 && t.eighths !== target; i++) tap(t.eighths < target ? pour : tip);
+      return tapCheck();
+    }
+    tap(document.querySelector(`.container-btn[aria-label="${t.answer}"]`));
   },
 };
 GAMES.capacity = capacity;

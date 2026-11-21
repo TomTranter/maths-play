@@ -29,9 +29,26 @@ import subprocess
 import sys
 from pathlib import Path
 
+import os
+
 import lameenc
 import numpy as np
+import onnxruntime
 from piper import PiperVoice, SynthesisConfig
+
+# Be kind to the computer: Piper's engine otherwise grabs every CPU core (and ignores taskset).
+# Set VOICE_THREADS to change it.
+_SessionOptions = onnxruntime.SessionOptions
+
+
+def _limited_session_options():
+    opts = _SessionOptions()
+    opts.intra_op_num_threads = int(os.environ.get("VOICE_THREADS", "4"))
+    opts.inter_op_num_threads = 1
+    return opts
+
+
+onnxruntime.SessionOptions = _limited_session_options
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "audio" / "cori"

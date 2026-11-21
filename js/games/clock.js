@@ -109,4 +109,16 @@ const clock = {
     }
   },
 };
+// Plays the right answer through the real controls (used by ?selftest).
+clock.test = {
+  answer() {
+    const t = task;
+    if (t.kind === "read") return tapChoice(timeLabel(t.th, t.tm));
+    const hour = document.querySelector('[data-hand="hour"]'), minute = document.querySelector('[data-hand="minute"]');
+    for (let i = 0; i < 12 && t.h !== t.th; i++) tap(hour);
+    for (let i = 0; i < 4 && t.m !== t.tm; i++) { if (!minute) throw new Error("the minutes need changing but there is no long-hand button"); tap(minute); }
+    if (t.h !== t.th || t.m !== t.tm) throw new Error("couldn't set the clock to the asked time");
+    tapCheck();
+  },
+};
 GAMES.clock = clock;

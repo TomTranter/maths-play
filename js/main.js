@@ -20,7 +20,8 @@ function sheet(inner) {
 // Level list for one game: pick any level; it starts fresh from there.
 function openLevelPicker(g) {
   const p = prog(g.id);
-  const el = sheet(`<h2></h2><p class="note">Choose a level</p><div class="level-list"></div><button class="soft cancel">Close</button>`);
+  const el = sheet(`<h2></h2><p class="note">Choose a level</p><div class="level-list"></div><button class="soft cancel">Close</button>
+    <p class="note version">Number Garden ${APP_VERSION}</p>`);
   el.querySelector("h2").textContent = g.name;
   const list = el.querySelector(".level-list");
   g.levels.forEach((L, i) => {

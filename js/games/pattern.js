@@ -70,6 +70,7 @@ const pattern = {
     options.forEach((o) => {
       const num = L.kind === "number";
       const b = h(num ? `<button class="choice">${o}</button>` : `<button class="choice pic" aria-label="Pattern piece">${itemSVG(o)}</button>`);
+      if (num ? o === answer : sameItem(o, answer)) t.answerBtn = b;
       b.onclick = () => {
         if (busy) return;
         const ok = num ? o === answer : sameItem(o, answer);
@@ -82,5 +83,9 @@ const pattern = {
       g.append(b);
     });
   },
+};
+// Plays the right answer through the real controls (used by ?selftest).
+pattern.test = {
+  answer() { tap(task.answerBtn); },
 };
 GAMES.pattern = pattern;

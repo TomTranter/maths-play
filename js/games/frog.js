@@ -119,4 +119,12 @@ const frog = {
     }, 1300);
   },
 };
+// Plays the right answer through the real controls (used by ?selftest).
+frog.test = {
+  answer() {
+    const hit = task.river.querySelector(`.hit[data-n="${task.ans}"]`);
+    if (!hit) throw new Error(`the answer ${task.ans} is not on the number line`);
+    tap(hit);
+  },
+};
 GAMES.frog = frog;

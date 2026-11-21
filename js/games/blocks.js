@@ -95,4 +95,14 @@ const blocks = {
     } else { shakeEl(t.board); miss(moreOrLess(total, t.target)); }
   },
 };
+// Plays the right answer through the real controls (used by ?selftest).
+blocks.test = {
+  answer() {
+    const t = task;
+    if (t.kind === "read") return tapChoice(t.target);
+    for (let i = 0; i < Math.floor(t.target / 10); i++) tap(t.board.querySelector('[data-act="tens+"]'));
+    for (let i = 0; i < t.target % 10; i++) tap(t.board.querySelector('[data-act="ones+"]'));
+    tapCheck();
+  },
+};
 GAMES.blocks = blocks;

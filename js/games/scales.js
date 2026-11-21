@@ -56,4 +56,8 @@ const scales = {
     t.unit = unit;
   },
 };
+// Plays the right answer through the real controls (used by ?selftest).
+scales.test = {
+  answer() { const t = task; tapChoice(t.kind === "temp" ? `${t.value}°` : `${t.value} ml`); },
+};
 GAMES.scales = scales;

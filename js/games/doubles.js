@@ -40,7 +40,7 @@ const doubles = {
       checkRow((btn) => doubles.checkCopy(btn), () => { t.right = 0; doubles.renderBug(); });
     } else if (L.kind === "double") {
       const n = rand(1, 10), half = Math.random() < 0.4;
-      Object.assign(t, { n });
+      Object.assign(t, { n, answer: half ? n : 2 * n });
       $("stage").replaceChildren(h(`<div class="ladybird">${ladybirdSVG(n, n)}</div>`));
       if (half) {
         setInstruction(`This ladybird has <b>${2 * n}</b> spots. How many on each wing?`, `This ladybird has ${2 * n} spots. How many on each wing?`);
@@ -108,6 +108,21 @@ const doubles = {
         }
       }, 400);
     }
+  },
+};
+// Plays the right answer through the real controls (used by ?selftest).
+doubles.test = {
+  async answer() {
+    const t = task;
+    if (t.kind === "copy") {
+      for (let i = 0; i < t.n; i++) tap(t.wrap.querySelector(".wing-r"));
+      tapCheck(); await wait(30);
+      return tapChoice(2 * t.n);
+    }
+    if (t.kind === "double") return tapChoice(t.answer);
+    for (const s of [...document.querySelectorAll(".sock")]) tap(s);
+    await wait(600);
+    tapChoice(t.N % 2 ? "Odd" : "Even");
   },
 };
 GAMES.doubles = doubles;

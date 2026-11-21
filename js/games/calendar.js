@@ -28,6 +28,7 @@ const calendar = {
   </svg>`,
   // Text choices that read themselves out when a wrong one is tapped (helps children who can't read yet).
   wordChoices(answer, options, hint, winText, winSay, art) {
+    task.answer = answer;
     const g = $("ground"); g.innerHTML = "";
     shuffle([answer, ...options]).forEach((o) => {
       const b = h(`<button class="choice wide${art ? " pic" : ""}">${art ? art(o) : ""}<span></span></button>`);
@@ -84,5 +85,9 @@ const calendar = {
       }
     }
   },
+};
+// Plays the right answer through the real controls (used by ?selftest).
+calendar.test = {
+  answer() { const a = task.answer; tapChoice(a[0].toUpperCase() + a.slice(1)); },
 };
 GAMES.calendar = calendar;

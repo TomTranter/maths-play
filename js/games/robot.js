@@ -183,4 +183,26 @@ const robot = {
     robot.reset(); busy = false;
   },
 };
+// Plays the right answer through the real controls (used by ?selftest).
+robot.test = {
+  answer() {
+    const t = task, turns = t.L.kind !== "straight";
+    const key = (p, d) => `${p},${d}`, seen = new Set([key(t.start, t.dir)]), queue = [[t.start, t.dir, []]];
+    let path = null;
+    while (queue.length) {
+      const [p, d, steps] = queue.shift();
+      if (same(p, t.goal)) { path = steps; break; }
+      const moves = [["F", addv(p, DIRS[d]), d]];
+      if (turns) moves.push(["L", p, (d + 3) % 4], ["R", p, (d + 1) % 4]);
+      for (const [c, np, nd] of moves) {
+        if (!inGrid(np) || t.rocks.some((r) => same(r, np)) || seen.has(key(np, nd))) continue;
+        seen.add(key(np, nd)); queue.push([np, nd, [...steps, c]]);
+      }
+    }
+    if (!path) throw new Error("the star can't be reached");
+    if (path.length > 14) throw new Error(`the shortest route needs ${path.length} steps but only 14 fit`);
+    for (const c of path) tap(document.querySelector(`[data-cmd="${c}"]`));
+    tapCheck();
+  },
+};
 GAMES.robot = robot;

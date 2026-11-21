@@ -3,7 +3,7 @@
 // are shared with the game scripts that load after it.
 "use strict";
 
-const APP_VERSION = "2.5"; // shown in the grown-ups panel, to check a tablet has the latest update
+const APP_VERSION = "3.0"; // shown in the grown-ups panel, to check a tablet has the latest update
 const STORE_KEY = "balloon-pop-maths"; // original key, so existing scores carry over
 const ROUNDS_PER_LEVEL = 4;
 const COLORS = [
@@ -355,6 +355,22 @@ function win(el, text, spoken) {
   afterSpeech(say(up ? `${spoken}. Level up! ${lvl}.` : spoken, 150), up ? 2600 : 2000, () => GAMES[route].next());
 }
 function miss(text) { task.mistakes++; boing(); say(text); }
+
+/* Helpers for game test hooks (game.test.answer, used by ?selftest). */
+// Wait until the game is ready for taps (entrance animations, hops and so on have finished).
+async function settle(maxMs = 4000) { for (let i = 0; i < maxMs / 40 && busy; i++) await wait(40); await wait(30); }
+// Tap an element like a finger would (works for SVG shapes too, which have no .click()).
+function tap(el, x, y) {
+  if (!el) throw new Error("tap: nothing to tap");
+  el.dispatchEvent(new MouseEvent("click", { bubbles: true, clientX: x, clientY: y }));
+}
+// Tap the answer button on the grass whose text matches.
+function tapChoice(text) {
+  const b = [...document.querySelectorAll("#ground .choice")].find((x) => x.textContent.trim() === String(text) || x.getAttribute("aria-label") === String(text));
+  if (!b) throw new Error(`no answer button "${text}" on screen`);
+  tap(b);
+}
+const tapCheck = () => tap(document.querySelector("#ground .check"));
 
 function distractors(n, lo, hi, deltas, first = []) {
   const out = [];

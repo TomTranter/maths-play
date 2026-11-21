@@ -127,7 +127,7 @@ const shapes = {
   // "I have 3 sides and 3 corners. What am I?" — answer by tapping a picture.
   riddle() {
     const kind = pick(Object.keys(SHAPES));
-    newTask({ kind: "riddle" });
+    newTask({ kind: "riddle", answer: kind });
     const wrong = shuffle(Object.keys(SHAPES).filter((k) => k !== kind && !(kind === "rectangle" && k === "square") && !(kind === "square" && k === "rectangle"))).slice(0, 2);
     $("stage").replaceChildren(h(`<div class="riddle-mark">?</div>`));
     setInstruction(RIDDLES[kind].replace(/(\d+)/g, "<b>$1</b>"), RIDDLES[kind]);
@@ -141,6 +141,20 @@ const shapes = {
       };
       g.append(b);
     });
+  },
+};
+// Plays the right answer through the real controls (used by ?selftest).
+shapes.test = {
+  async answer() {
+    const t = task;
+    if (t.kind === "hunt") {
+      const els = [...t.svg.querySelectorAll(`.shp[data-k="${t.target}"]`)];
+      if (els.length !== t.want) throw new Error(`${els.length} ${t.target}s on screen but ${t.want} wanted`);
+      for (const el of els) { tap(el); await wait(10); }
+      return;
+    }
+    if (t.kind === "count") return tapChoice(SHAPES[t.shape].sides);
+    tapChoice(t.answer);
   },
 };
 GAMES.shapes = shapes;

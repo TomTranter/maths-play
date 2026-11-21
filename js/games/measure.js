@@ -115,4 +115,12 @@ const measure = {
       `Yes! ${n} cm`, `Yes! The ${obj} is ${n} centimetres long.`);
   },
 };
+// Plays the right answer through the real controls (used by ?selftest).
+measure.test = {
+  answer() {
+    const t = task;
+    if (t.kind === "compare") return tap(t.svg.querySelector(`.snake-hit[data-c="${t.answer}"] rect`));
+    tapChoice(t.n);
+  },
+};
 GAMES.measure = measure;

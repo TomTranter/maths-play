@@ -105,4 +105,16 @@ const coins = {
     else { shakeEl(t.purseEl); miss(total < t.price ? "Not enough money yet." : "Too much! Take a coin back."); }
   },
 };
+// Plays the right answer through the real controls (used by ?selftest).
+coins.test = {
+  answer() {
+    const t = task;
+    if (t.kind === "count") return tapChoice(`${t.total}p`);
+    const bank = [...document.querySelectorAll(".bank .coin")].map((b) => [+b.getAttribute("aria-label").match(/\d+/)[0], b]).sort((a, b) => b[0] - a[0]);
+    let left = t.price, used = 0;
+    for (const [v, b] of bank) while (left >= v) { tap(b); left -= v; used++; }
+    if (left || used > 15) throw new Error(`can't pay ${t.price}p with the coins shown`);
+    tapCheck();
+  },
+};
 GAMES.coins = coins;

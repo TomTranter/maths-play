@@ -40,7 +40,7 @@ async function runSelfTest() {
         const t = task, s0 = S.score;
         try { await g.test.answer(); }
         catch (e) { fails.push(`level ${lv + 1}: test.answer() threw "${e.message}"`); continue; }
-        for (let i = 0; i < 80 && S.score === s0; i++) await pause(50);
+        for (let i = 0; i < 240 && S.score === s0; i++) await pause(50); // up to 12s: a long robot route takes a while
         if (S.score === s0) fails.push(`level ${lv + 1}: the right answer didn't award a star`);
         for (let i = 0; i < 80 && task === t; i++) await pause(50);
         if (task === t) fails.push(`level ${lv + 1}: didn't move on to a new round`);

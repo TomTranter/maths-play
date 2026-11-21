@@ -70,6 +70,7 @@ const symmetry = {
       const row = h('<div class="sym-choices"></div>');
       opts.forEach((o) => {
         const b = h(`<button class="sym-card" aria-label="Pattern">${symmetry.gridHTML(L.size, o.left, o.right, false)}</button>`);
+        if (o.sym) t.good = b;
         b.onclick = () => {
           if (busy) return;
           if (o.sym) win(b, "Symmetrical!", "Yes! That pattern is symmetrical.");
@@ -85,6 +86,18 @@ const symmetry = {
   render() {
     const t = task;
     t.wrap.innerHTML = symmetry.gridHTML(t.L.size, t.left, t.right, true);
+  },
+};
+// Plays the right answer through the real controls (used by ?selftest).
+symmetry.test = {
+  answer() {
+    const t = task;
+    if (t.L.kind === "spot") return tap(t.good);
+    const half = t.L.size / 2;
+    t.want.forEach((row, r) => row.forEach((v, c) => {
+      for (let k = 0; k < v; k++) tap(t.wrap.querySelector(`.sq[data-r="${r}"][data-c="${c + half}"]`));
+    }));
+    tapCheck();
   },
 };
 GAMES.symmetry = symmetry;

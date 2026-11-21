@@ -23,7 +23,8 @@ const mygame = {
   art: `<svg viewBox="0 0 120 90" aria-hidden="true">…</svg>`,   // home tile picture
   css: `.mygame-board { … }`,          // optional styles; prefix class names with the game id
 
-  next(first) {                        // start one round (called again after every right answer)
+  next(first) {                        // start one round; called again after every right answer.
+                                       // `first` is true when the game has just been opened (or the level changed)
     const L = level(mygame);           // the current level object
     const t = newTask({ answer: 7 });  // always start with newTask(); store what you need on it
     $("stage").replaceChildren(h(`<div class="mygame-board">…</div>`));   // the picture area
@@ -58,7 +59,8 @@ addGame(mygame);
 | `win(el, bannerText, spokenWin)` | A right answer: stars, confetti, banner, voice, then the next round. |
 | `miss(hint)` | A wrong answer: a boing and a spoken hint. Never takes stars away. |
 | `say(text)` | Speak a line (Cori's recorded voice). |
-| `rand(a, b)`, `pick(arr)`, `shuffle(arr)`, `plural(n, "apple", "apples")`, `distractors(n, lo, hi, deltas)` | Small maths helpers. |
+| `rand(a, b)`, `pick(arr)`, `shuffle(arr)`, `plural(n, "apple", "apples")` | Small maths helpers (`rand` includes both ends). |
+| `distractors(n, lo, hi, deltas, first = [])` | Two wrong answers near `n`: tries the values in `first`, then `n + delta` for each delta in random order, keeping ones inside `lo..hi` that aren't `n`. Give enough deltas that two always fit (e.g. `[-2, -1, 1, 2]`), or it can return fewer than two. |
 | `h(html)`, `$(id)` | Make an element from HTML; get an element by id. |
 | `click()`, `chime(i)`, `boing()`, `popSound()`, `tone(...)` | Sounds. |
 | `shakeEl(el)`, `burst(x, y, colour)`, `confetti()`, `banner(text)` | Little effects. |
@@ -79,14 +81,18 @@ CSS variables in [`css/app.css`](../css/app.css) (`--paper`, `--ink`, `--sun`, `
   `"There are 7 apples."` covered. Keep the number of different sentences sensible (hundreds, not thousands):
   split long lines into short sentences so the parts repeat.
 - **Prefix CSS classes with the game id** so games don't clash.
+- **`voiceLines()` runs outside the browser** (in `tools/collect_lines.mjs`), where only `rand`, `pick`, `shuffle`,
+  `plural`, `level`, `prog` and your own file's names exist: no `h`, `$`, `distractors` or DOM. Build the list from
+  plain loops over every possible value.
 - **Don't add global names that might clash**: keep helpers inside the game object, or prefix them.
 
 ## After writing the file
 
 ```bash
-python3 tools/register_games.py        # adds it to index.html and the offline list
+node --check js/games/mygame.js        # catches typos
 node tools/collect_lines.mjs mygame    # checks voiceLines() runs, shows a sample
-uv run tools/make_voice.py             # records Cori saying the new lines (needs the Piper voice, see README)
+python3 tools/register_games.py        # adds it to index.html and the offline list
+nice -n 10 uv run tools/make_voice.py  # records Cori saying the new lines (needs the Piper voice, see README)
 python3 -m http.server 8000            # then open http://localhost:8000/?selftest=mygame
 ```
 

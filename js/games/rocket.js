@@ -85,4 +85,15 @@ const rocket = {
     }, reduced ? 50 : 700);
   },
 };
+// Plays the right answer through the real controls (used by ?selftest).
+rocket.test = {
+  answer() {
+    const t = task;
+    if (t.L.kind === "read") return tapChoice(t.target);
+    const p = t.svg.createSVGPoint();
+    p.x = rocket.x(t.target, t.L.max); p.y = LY;
+    const s = p.matrixTransform(t.svg.getScreenCTM());
+    tap(t.svg, s.x, s.y);
+  },
+};
 GAMES.rocket = rocket;
