@@ -53,13 +53,19 @@ const pattern = {
       answer = seq[total];
       cars = seq.slice(0, total).map((it) => itemSVG(it));
       // wrong options: other items from the pattern, or a lookalike with a different colour/shape
-      const pool = unit.filter((u) => !sameItem(u, answer));
+      const pool = unit.filter((u, i) => !sameItem(u, answer) && unit.findIndex((q) => sameItem(q, u)) === i); // AAB repeats A
       while (pool.length < 2) pool.push({ shape: answer.shape, color: PATTERN_COLS.find((c) => c !== answer.color && !pool.some((q) => q.color === c)) });
       options = shuffle([answer, ...shuffle(pool).slice(0, 2)]);
     }
     t.answer = answer;
-    const wrap = h(`<div class="train">
-      <div class="engine" aria-hidden="true"><span class="chimney"></span></div>
+    const count = cars.length + 2; // engine and mystery car too
+    const wrap = h(`<div class="train" style="--n:${count};--half:${Math.ceil(count / 2)}">
+      <div class="engine" aria-hidden="true"><svg viewBox="0 0 80 100">
+        <g stroke="#1d3557" stroke-width="4" stroke-linejoin="round"><path d="M14 38 V14 H8 V6 H32 V14 H26 V38 Z" fill="#56627a"/>
+        <path d="M46 20 H78 V80 H46 Z" fill="#e63946"/><rect x="53" y="28" width="18" height="20" rx="4" fill="#d4f0ff"/>
+        <path d="M48 36 H16 Q4 36 4 48 V80 H48 Z" fill="#ff7a59"/><path d="M8 80 H78 V86 H2 Z" fill="#ffd23f"/>
+        <circle cx="22" cy="86" r="11" fill="#56627a"/><circle cx="62" cy="86" r="11" fill="#56627a"/><circle cx="13" cy="52" r="6" fill="#fff6bf"/></g>
+        <circle cx="22" cy="86" r="3" fill="#fff"/><circle cx="62" cy="86" r="3" fill="#fff"/></svg></div>
       ${cars.map((c) => `<div class="car">${c}</div>`).join("")}
       <div class="car mystery">?</div>
     </div>`);

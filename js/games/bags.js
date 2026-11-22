@@ -4,9 +4,8 @@
 
 const SWEET_COLS = ["#ff4d6d", "#ffd23f", "#2ec27e", "#3aa6e8", "#9b5de5", "#ff9f1c"];
 const sweetSVG = (c) => `<svg viewBox="0 0 60 40" aria-hidden="true">
-  <path d="M3 8 L19 20 L3 32 Z M57 8 L41 20 L57 32 Z" fill="${c}" stroke="#1d3557" stroke-width="2.5" stroke-linejoin="round"/>
-  <ellipse cx="30" cy="20" rx="14" ry="12" fill="${c}" stroke="#1d3557" stroke-width="2.5"/>
-  <path d="M24 14 q6 -4 12 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".75"/></svg>`;
+  <g fill="${c}" stroke="#1d3557" stroke-width="2.5" stroke-linejoin="round"><path d="M20 20 L4 6 Q9 13 3 20 Q9 27 4 34 Z M40 20 L56 6 Q51 13 57 20 Q51 27 56 34 Z"/><ellipse cx="30" cy="20" rx="15" ry="14"/></g>
+  <path d="M27 8 q-8 12 0 24 M36 9 q-8 11 0 22" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".65"/></svg>`;
 
 const bags = {
   id: "bags", name: "Party Bags", strand: "Sharing & groups",

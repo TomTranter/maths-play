@@ -4,11 +4,11 @@
 "use strict";
 
 const SCALE_OBJECTS = {
-  feather: { w: 1, svg: '<path d="M8 50 C 20 30, 36 14, 54 8 C 50 26, 36 42, 14 50 Z" fill="#f4efe3" stroke="#8a93a0" stroke-width="2.5"/><path d="M6 54 L40 22" stroke="#8a93a0" stroke-width="2.5" stroke-linecap="round"/>' },
-  apple: { w: 3, svg: '<path d="M30 18 C 18 10 4 18 7 34 C 10 50 22 58 30 53 C 38 58 50 50 53 34 C 56 18 42 10 30 18 Z" fill="#e63946" stroke="#9d1c27" stroke-width="2.5"/><path d="M30 18 q1 -8 6 -12" stroke="#7a5128" stroke-width="3.5" fill="none" stroke-linecap="round"/>' },
-  book: { w: 5, svg: '<rect x="6" y="14" width="48" height="38" rx="3" fill="#3aa6e8" stroke="#13558a" stroke-width="2.5"/><rect x="10" y="44" width="40" height="5" fill="#fff"/><rect x="14" y="20" width="24" height="4" rx="2" fill="#d4f0ff"/>' },
-  pumpkin: { w: 8, svg: '<ellipse cx="30" cy="36" rx="25" ry="19" fill="#ff9f1c" stroke="#a85a00" stroke-width="2.5"/><path d="M30 17 v38 M18 20 q-6 16 0 32 M42 20 q6 16 0 32" stroke="#a85a00" stroke-width="2" fill="none"/><path d="M30 18 q0 -8 6 -12" stroke="#3f8f33" stroke-width="4" fill="none" stroke-linecap="round"/>' },
-  watermelon: { w: 10, svg: '<ellipse cx="30" cy="34" rx="27" ry="20" fill="#2ec27e" stroke="#0f6b40" stroke-width="2.5"/><path d="M12 22 q8 12 0 24 M24 15 q8 19 0 38 M36 15 q-8 19 0 38 M48 22 q-8 12 0 24" stroke="#0f6b40" stroke-width="3" fill="none"/>' },
+  feather: { w: 1, svg: '<path d="M10 52 C6 28 28 6 54 6 C56 14 52 20 46 22 L50 26 C44 36 38 40 32 40 L34 46 C26 52 18 52 10 52 Z" fill="#c5a3f5" stroke="#1d3557" stroke-width="2.5" stroke-linejoin="round"/><path d="M4 58 Q22 36 46 13 M20 40 l-3 -15 M30 29 l-1 -13 M21 40 l13 1 M32 28 l12 0" stroke="#1d3557" stroke-width="2.3" fill="none" stroke-linecap="round"/>' },
+  apple: { w: 3, svg: '<path d="M30 18 C18 10 4 18 7 34 C10 50 22 58 30 53 C38 58 50 50 53 34 C56 18 42 10 30 18 Z" fill="#e63946" stroke="#1d3557" stroke-width="2.5"/><path d="M30 18 q1 -8 5 -13" stroke="#7a5128" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M33 12 q9 -12 19 -4 q-7 11 -19 4z" fill="#58c85f" stroke="#1d3557" stroke-width="2"/><path d="M14 30 q1 -8 8 -9" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/>' },
+  book: { w: 5, svg: '<path d="M6 40 V14 Q6 8 12 8 H50 V44 H12 Q6 44 6 50 Q6 56 12 56 H54 V14" fill="#3aa6e8" stroke="#1d3557" stroke-width="2.5" stroke-linejoin="round"/><path d="M12 44 H50 V52 H12 Q8 48 12 44z" fill="#fff" stroke="#1d3557" stroke-width="2"/><path d="M15 9 v34" stroke="#13558a" stroke-width="3"/><path d="M33 16 l3.5 7 8 1 -6 5 2 8 -7.5 -4 -7.5 4 2 -8 -6 -5 8 -1z" fill="#ffd23f"/>' },
+  pumpkin: { w: 8, svg: '<path d="M28 19 q-2 -10 7 -15 l3 5 q-5 4 -4 10z" fill="#3f8f33" stroke="#1d3557" stroke-width="2"/><g fill="#ff9f1c" stroke="#1d3557" stroke-width="2.5"><ellipse cx="17" cy="37" rx="14" ry="18"/><ellipse cx="43" cy="37" rx="14" ry="18"/><ellipse cx="30" cy="37" rx="14" ry="20"/></g><path d="M23 29 q2 -6 7 -7" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".7"/>' },
+  watermelon: { w: 10, svg: '<ellipse cx="30" cy="36" rx="28" ry="21" fill="#58c85f" stroke="#1d3557" stroke-width="2.5"/><path d="M12 24 q-9 12 1 24 M23 17 l-5 8 4 6 -5 7 6 8 -1 8 M36 17 l5 8 -4 6 5 7 -6 8 1 8 M48 24 q9 12 -1 24" stroke="#1f8a50" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M26 22 h8" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".7"/>' },
 };
 const BLOCK_COLS = ["#ff4d6d", "#ff9f1c", "#f5c400", "#2ec27e", "#3aa6e8", "#9b5de5", "#f15bb5", "#13558a", "#a85a00", "#0f6b40"];
 const PIVOT = { x: 180, y: 64 }, ARM = 128, DROP = 62;
@@ -92,12 +92,13 @@ const balance = {
     const t = task, th = (t.theta * Math.PI) / 180, c = Math.cos(th), s = Math.sin(th);
     const L = { x: PIVOT.x - ARM * c, y: PIVOT.y - ARM * s }, R = { x: PIVOT.x + ARM * c, y: PIVOT.y + ARM * s };
     const pan = (p) => `<path d="M${p.x} ${p.y} L${p.x - 50} ${p.y + DROP} M${p.x} ${p.y} L${p.x + 50} ${p.y + DROP}" stroke="#56627a" stroke-width="2"/>
-      <path d="M${p.x - 60} ${p.y + DROP} h120 q-60 26 -120 0z" fill="#d9dde3" stroke="#7b8492" stroke-width="3"/>`;
+      <path d="M${p.x - 60} ${p.y + DROP} h120 q-8 24 -60 26 q-52 -2 -60 -26z" fill="#ffd23f" stroke="#1d3557" stroke-width="3" stroke-linejoin="round"/><path d="M${p.x - 42} ${p.y + DROP + 9} q16 9 38 9" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/>`;
     t.svg.innerHTML = `
-      <rect x="${PIVOT.x - 7}" y="${PIVOT.y}" width="14" height="158" rx="4" fill="#7a5128"/>
-      <rect x="${PIVOT.x - 60}" y="${PIVOT.y + 154}" width="120" height="14" rx="6" fill="#7a5128"/>
+      <path d="M${PIVOT.x - 8} ${PIVOT.y} h16 l6 148 h-28z" fill="#b07a43" stroke="#1d3557" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M${PIVOT.x - 62} ${PIVOT.y + 168} q2 -22 62 -22 q60 0 62 22z" fill="#b07a43" stroke="#1d3557" stroke-width="3" stroke-linejoin="round"/>
       ${pan(L)}${pan(R)}
-      <line x1="${L.x}" y1="${L.y}" x2="${R.x}" y2="${R.y}" stroke="#b07a43" stroke-width="12" stroke-linecap="round"/>
+      <line x1="${L.x}" y1="${L.y}" x2="${R.x}" y2="${R.y}" stroke="#1d3557" stroke-width="15" stroke-linecap="round"/>
+      <line x1="${L.x}" y1="${L.y}" x2="${R.x}" y2="${R.y}" stroke="#e0a45f" stroke-width="9" stroke-linecap="round"/>
       <circle cx="${PIVOT.x}" cy="${PIVOT.y}" r="9" fill="#ffd23f" stroke="#7a5128" stroke-width="3"/>
       ${balance.panItems("left", L.x, L.y + DROP, "left")}${balance.panItems("right", R.x, R.y + DROP, "right")}`;
   },

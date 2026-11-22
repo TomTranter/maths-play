@@ -26,6 +26,10 @@ It works on an iPad, Android tablet, phone or computer, and keeps working offlin
 </tr>
 </table>
 
+Phones work either way up. On its side, the answers move to the right, under a thumb:
+
+<img src="docs/images/phone-landscape.png" alt="Hungry Crocodile on a phone held sideways, with the answer buttons in a grass column on the right" width="520">
+
 ---
 
 ## Put it on your child's tablet (2 minutes)
@@ -146,7 +150,7 @@ python3 -m http.server 8000                         # open http://localhost:8000
 - **Speak everything.** Children who can't read rely on the voice. List every sentence in `voiceLines()`;
   the self-test reports any sentence that has no recording.
 - **Hints, never penalties.** Use `miss("Count them again.")` for wrong answers.
-- **Think phone first.** Check it at 400×800 with big buttons (at least 44px) and no scrolling.
+- **Think phone first.** Check it at 375×667 and on its side at 568×320, with big buttons (at least 44px).
 - **Keep sentences short and reusable.** Each different sentence is one recording, so "There are 7 apples." is
   better than one long sentence that mixes several numbers.
 
@@ -177,6 +181,8 @@ Plain HTML, CSS and JavaScript: no build step, no frameworks, no tracking, no ne
 ```
 index.html                page shell; loads core, every game, then main
 css/app.css               shared styles and colours
+css/layout.css            fitting phones (upright and on their side) and tablets; js/fit.js is the backstop
+css/scenery.css           sky, hills, meadow and paintwork
 js/core.js                engine: sound, voice, effects, stars, levels, choices, routing
 js/games/*.js             one file per game
 js/main.js, js/selftest.js  start-up; ?selftest runner

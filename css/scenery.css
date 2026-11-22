@@ -1,0 +1,86 @@
+/* The world behind the games, and how the pieces are painted. Nothing here decides sizes of the layout. */
+
+/* ---------- sky, hills, meadow ---------- */
+.hills {
+  position: absolute; left: 0; right: 0; bottom: 0; height: clamp(120px, 34%, 300px); z-index: 0; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1200 300%22 preserveAspectRatio=%22none%22%3E %3Cpath d=%22M0 150 C120 60 250 70 360 150 C470 40 640 30 760 140 C900 70 1060 80 1200 170 V300 H0Z%22 fill=%22%23b9e6c4%22/%3E %3Cpath d=%22M0 220 C140 130 300 140 420 220 C560 120 760 110 900 215 C1000 160 1110 160 1200 205 V300 H0Z%22 fill=%22%2398d89b%22/%3E%3C/svg%3E") 50% 100% / max(900px, 100%) 100% no-repeat;
+}
+.sun {
+  position: absolute; right: -34px; top: 15%; width: 104px; height: 104px; z-index: 0; pointer-events: none; border-radius: 50%;
+  background: #ffe066; box-shadow: 0 0 0 14px rgba(255, 224, 102, 0.28), 0 0 0 30px rgba(255, 224, 102, 0.14);
+}
+.ground { background: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%2260%22%3E%3Cpath d=%22M20 50 l-5 -10 l6 6 l2 -10 l3 10 l6 -6 l-4 10z%22 fill=%22%234a9a32%22/%3E%3Ccircle cx=%2262%22 cy=%2240%22 r=%223.4%22 fill=%22%23fff%22/%3E%3Ccircle cx=%2266%22 cy=%2244%22 r=%223.4%22 fill=%22%23fff%22/%3E%3Ccircle cx=%2262%22 cy=%2248%22 r=%223.4%22 fill=%22%23fff%22/%3E%3Ccircle cx=%2258%22 cy=%2244%22 r=%223.4%22 fill=%22%23fff%22/%3E%3Ccircle cx=%2262%22 cy=%2244%22 r=%222.6%22 fill=%22%23ffd23f%22/%3E%3Cpath d=%22M112 38 l-5 -10 l6 6 l2 -10 l3 10 l6 -6 l-4 10z%22 fill=%22%234a9a32%22/%3E%3Ccircle cx=%22168%22 cy=%2246%22 r=%223.4%22 fill=%22%23ff8fab%22/%3E%3Ccircle cx=%22172%22 cy=%2250%22 r=%223.4%22 fill=%22%23ff8fab%22/%3E%3Ccircle cx=%22168%22 cy=%2254%22 r=%223.4%22 fill=%22%23ff8fab%22/%3E%3Ccircle cx=%22164%22 cy=%2250%22 r=%223.4%22 fill=%22%23ff8fab%22/%3E%3Ccircle cx=%22168%22 cy=%2250%22 r=%222.6%22 fill=%22%23ffd23f%22/%3E%3Cpath d=%22M205 54 l-5 -10 l6 6 l2 -10 l3 10 l6 -6 l-4 10z%22 fill=%22%234a9a32%22/%3E%3Ccircle cx=%22238%22 cy=%2228%22 r=%223.4%22 fill=%22%23c5a3f5%22/%3E%3Ccircle cx=%22242%22 cy=%2232%22 r=%223.4%22 fill=%22%23c5a3f5%22/%3E%3Ccircle cx=%22238%22 cy=%2236%22 r=%223.4%22 fill=%22%23c5a3f5%22/%3E%3Ccircle cx=%22234%22 cy=%2232%22 r=%223.4%22 fill=%22%23c5a3f5%22/%3E%3Ccircle cx=%22238%22 cy=%2232%22 r=%222.6%22 fill=%22%23ffd23f%22/%3E%3C/svg%3E") 0 100% / 260px 60px repeat-x, var(--grass); }
+
+/* ---------- home ---------- */
+.tile svg { background: var(--tint); border-radius: 18px; padding: 7px; max-width: 170px; aspect-ratio: 4 / 3; }
+.tile:nth-child(6n+1) { --tint: #e3f4ff; }
+.tile:nth-child(6n+2) { --tint: #fff3c4; }
+.tile:nth-child(6n+3) { --tint: #ffe3ec; }
+.tile:nth-child(6n+4) { --tint: #e6f6dc; }
+.tile:nth-child(6n+5) { --tint: #eee4ff; }
+.tile:nth-child(6n)   { --tint: #ffe8d1; }
+.home h1 { padding-top: 4px; }
+@media (orientation: landscape) and (max-height: 520px) {
+  .sun { top: 74px; right: auto; left: 22px; width: 52px; height: 52px; }
+  .tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; width: 100%; }
+  .home { gap: 8px; }
+  .home h1 { font-size: 2rem; }
+  .tile { font-size: 1rem; padding: 7px 6px 9px; border-radius: 20px; }
+  .tile svg { max-height: 22vh; width: auto; max-width: 100%; height: 22vh; }
+}
+
+/* ---------- frog and rocket ---------- */
+.river .bank { fill: #7fce6b; stroke: var(--pad-dark); stroke-width: 3; }
+.river .reed { fill: none; stroke: var(--pad-dark); stroke-width: 4; stroke-linecap: round; }
+.river .reed-top { fill: var(--wood); stroke: var(--wood-dark); stroke-width: 2; }
+.river .water { stroke: var(--water-dark); stroke-width: 4; }
+.river .ripple { stroke: #a9dcf7; }
+.river .pad { stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; }
+.river .padnum { font-size: 32px; }
+.rocket-line { background: linear-gradient(#23336b, #4b4fa8); border: 4px solid var(--ink); touch-action: none; }
+.rocket-line svg { touch-action: none; }
+.rocket-line .nl-num { fill: var(--paper); font-size: 28px; }
+
+/* ---------- party bags and socks ---------- */
+.bag { --bag: #ff8fab; margin-top: 18px; background: repeating-linear-gradient(90deg, var(--bag) 0 16px, color-mix(in srgb, var(--bag), white 22%) 16px 32px); background-color: var(--bag); border: 3px solid var(--ink); }
+.bag:nth-child(2) { --bag: #74c7ec; } .bag:nth-child(3) { --bag: #ffd86b; } .bag:nth-child(4) { --bag: #8fdc9b; } .bag:nth-child(5) { --bag: #c5a3f5; }
+.bag::before { background: rgba(255, 255, 255, 0.7); border-bottom: 3px solid var(--ink); border-radius: 5px 5px 0 0; height: 18px; }
+.bag::after { content: ""; position: absolute; left: 30%; right: 30%; top: -22px; height: 22px; border: 4px solid var(--ink); border-bottom: 0; border-radius: 20px 20px 0 0; }
+.bags-wrap .pile .sweet { width: 56px; height: 46px; }
+.app .sock { width: 46px; height: 60px; }
+.line { border-top: 4px solid var(--wood-dark); border-radius: 50% / 8px; padding-top: 6px; }
+.hung { position: relative; }
+.hung::before { content: ""; position: absolute; left: 32%; top: -11px; width: 7px; height: 17px; border-radius: 3px; background: var(--sun); border: 2px solid var(--wood-dark); }
+
+/* ---------- train and caterpillar ---------- */
+.car { position: relative; background: linear-gradient(var(--paper) 78%, var(--sun) 78%); }
+.car::before, .car::after { content: ""; position: absolute; bottom: -12px; width: 26%; aspect-ratio: 1; border-radius: 50%; background: #56627a; border: 3px solid var(--ink); }
+.car::before { left: 8%; } .car::after { right: 8%; }
+.car.mystery { background: var(--paper); }
+.seg, .cat-head { position: relative; }
+.seg::after { content: ""; position: absolute; z-index: -1; left: 22%; right: 22%; bottom: -10px; height: 14px; border-left: 5px solid var(--ink); border-right: 5px solid var(--ink); }
+.cat-head::before { content: ""; position: absolute; left: 26%; right: 26%; top: -15px; height: 14px; border-left: 4px solid var(--ink); border-right: 4px solid var(--ink); transform: perspective(20px) rotateX(-18deg); }
+.cat-head::after { content: ""; position: absolute; left: 34%; right: 34%; bottom: 16%; height: 12%; border-bottom: 3px solid var(--ink); border-radius: 0 0 50% 50%; }
+
+/* ---------- small fixes to legibility ---------- */
+.cafe-op { color: var(--ink); text-shadow: none; background: var(--paper); border-radius: 22px; padding: 2px 12px; line-height: 1.2; box-shadow: 0 4px 0 var(--lift); }
+.farm .field { background: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%2260%22%3E%3Cpath d=%22M20 50 l-5 -10 l6 6 l2 -10 l3 10 l6 -6 l-4 10z%22 fill=%22%234a9a32%22/%3E%3Ccircle cx=%2262%22 cy=%2240%22 r=%223.4%22 fill=%22%23fff%22/%3E%3Ccircle cx=%2266%22 cy=%2244%22 r=%223.4%22 fill=%22%23fff%22/%3E%3Ccircle cx=%2262%22 cy=%2248%22 r=%223.4%22 fill=%22%23fff%22/%3E%3Ccircle cx=%2258%22 cy=%2244%22 r=%223.4%22 fill=%22%23fff%22/%3E%3Ccircle cx=%2262%22 cy=%2244%22 r=%222.6%22 fill=%22%23ffd23f%22/%3E%3Cpath d=%22M112 38 l-5 -10 l6 6 l2 -10 l3 10 l6 -6 l-4 10z%22 fill=%22%234a9a32%22/%3E%3Ccircle cx=%22168%22 cy=%2246%22 r=%223.4%22 fill=%22%23ff8fab%22/%3E%3Ccircle cx=%22172%22 cy=%2250%22 r=%223.4%22 fill=%22%23ff8fab%22/%3E%3Ccircle cx=%22168%22 cy=%2254%22 r=%223.4%22 fill=%22%23ff8fab%22/%3E%3Ccircle cx=%22164%22 cy=%2250%22 r=%223.4%22 fill=%22%23ff8fab%22/%3E%3Ccircle cx=%22168%22 cy=%2250%22 r=%222.6%22 fill=%22%23ffd23f%22/%3E%3Cpath d=%22M205 54 l-5 -10 l6 6 l2 -10 l3 10 l6 -6 l-4 10z%22 fill=%22%234a9a32%22/%3E%3Ccircle cx=%22238%22 cy=%2228%22 r=%223.4%22 fill=%22%23c5a3f5%22/%3E%3Ccircle cx=%22242%22 cy=%2232%22 r=%223.4%22 fill=%22%23c5a3f5%22/%3E%3Ccircle cx=%22238%22 cy=%2236%22 r=%223.4%22 fill=%22%23c5a3f5%22/%3E%3Ccircle cx=%22234%22 cy=%2232%22 r=%223.4%22 fill=%22%23c5a3f5%22/%3E%3Ccircle cx=%22238%22 cy=%2232%22 r=%222.6%22 fill=%22%23ffd23f%22/%3E%3C/svg%3E") 0 0 / 260px 60px, #b9e4a3; }
+
+/* ---------- upright phones: use the height ---------- */
+@container stage (max-aspect-ratio: 1/1) {
+  .app .bag { width: min(150px, (100cqw - 14px) / 2); }
+  .app .fractions-plate { width: min(150px, (100cqw - 24px) / 2.6); height: min(150px, (100cqw - 24px) / 2.6); }
+  .app .fractions-plates:has(> :nth-child(3)) .fractions-plate { width: min(150px, (100cqw - 18px) / 3); height: min(150px, (100cqw - 18px) / 3); }
+  .app .bear-scene { flex-direction: column; gap: 14px; }
+  .app .bear-me { width: min(44cqw, 32cqh, 180px); }
+  .app .bear-plate { --bear-c: min(56px, (100cqw - 90px) / 5); }
+  .app .fractions-plates:has(> :nth-child(4)) .fractions-plate { width: min(150px, (100cqw - 22px) / 4); height: min(150px, (100cqw - 22px) / 4); }
+  .app .sym-card { width: min(200px, (100cqw - 16px) / 2, 44cqh); }
+  .app .caterpillar { width: min(100cqw, 440px); row-gap: 18px; }
+  .app .caterpillar .seg, .app .caterpillar .cat-head { width: calc((min(100cqw, 440px) - 10px) / 4.2); font-size: 1.1rem; }
+  .app .cafe { flex-direction: column; gap: 8px; }
+  .app .cafe-card svg { width: min(120px, 24cqh); }
+  .app .croc { gap: 6px; }
+  .app .croc-num { font-size: min(15cqw, 4.4rem); }
+  .app .croc-side { padding: 24px 12px; }
+}

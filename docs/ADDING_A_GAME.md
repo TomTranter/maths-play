@@ -73,7 +73,13 @@ CSS variables in [`css/app.css`](../css/app.css) (`--paper`, `--ink`, `--sun`, `
 
 - **Speak everything.** Every instruction, hint and win is spoken, so children who can't read yet can play.
 - **Wrong answers never cost stars.** Give a gentle hint instead (`miss("Count them again.")`).
-- **Big targets.** Buttons and tappable things at least about 44px. Test at phone size (400×800).
+- **Big targets.** Buttons and tappable things at least about 44px.
+- **Fits every screen.** Check 320×568 and 375×667 (phone upright), 568×320 and 844×390 (phone on its side,
+  where the grass becomes a column on the right) and 1024×768. Size boards from the stage with `cqw`/`cqh`
+  (100cqh is the height of the sky area), not `vw`/`vh`. Anything still too big is shrunk by `js/fit.js`,
+  which keeps it visible but makes the targets smaller.
+- **No buttons inside buttons.** The browser splits them and the card comes out blank. Use `<span>` inside.
+- **`h()` takes one top-level element.** Anything after the first is lost (the self-test reports it).
 - **UK words.** "Take away", "p" for pence, "half past", "colour", "maths".
 - **Start win lines with "Yes!"**. The app swaps it for a random "Brilliant!", "Spot on!" and so on.
 - **`voiceLines()` must list every sentence exactly as spoken**, with every possible number filled in.
@@ -96,5 +102,6 @@ nice -n 10 uv run tools/make_voice.py  # records Cori saying the new lines (need
 python3 -m http.server 8000            # then open http://localhost:8000/?selftest=mygame
 ```
 
-The self-test plays every level using `test.answer()` and lists anything that doesn't award a star, and
-any sentence without a recording. Then play it yourself, on a phone-sized window too.
+The self-test plays every level using `test.answer()` and lists anything that doesn't award a star, anything
+off the screen at the current window size, and any sentence without a recording. Run it once with the window
+375×667 and once at 568×320, then play it yourself at both.

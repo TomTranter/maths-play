@@ -1,0 +1,241 @@
+/* How Number Garden fits each screen. Loaded after app.css.
+   1. the shell (never wider or taller than the screen)
+   2. phone held upright
+   3. phone on its side: one thin bar on top, answers in a grass column on the right
+   4. boards sized from the space the stage really has (cqw/cqh), not from the whole screen
+   5. side-by-side arrangements when the stage is much wider than it is tall
+   js/fit.js is the backstop: anything still too big is shrunk to fit.
+   Game styles are added after this file, so rules that override a game start with .app or #stage. */
+
+/* ---------- 1. shell ---------- */
+html { padding-bottom: 0; }
+.app {
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+}
+.bar, .bar-side, .controls, .chip { min-width: 0; }
+.bar-side, #soundBtn { flex: none; }
+.chip > span { max-width: 100%; }
+.instruction { min-height: 44px; min-width: 0; }
+#sayText { min-width: 0; overflow-wrap: break-word; text-wrap: balance; }
+.stage {
+  grid-row: 3; overflow: hidden; overflow: clip; /* clip: focus can never scroll a board away */
+  grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr);
+}
+body[data-route=""] .stage { overflow: hidden auto; grid-template-rows: auto; align-content: start; }
+.ground { grid-row: 4; padding-bottom: calc(22px + var(--safe-b)); }
+.ground > * { max-width: 100%; }
+.ground:empty { min-height: calc(34px + var(--safe-b)); padding-block: 0; }
+.fractions-tag:empty { visibility: hidden; }
+.eq { white-space: nowrap; }
+
+/* ---------- 2. phone, upright ---------- */
+@media (max-width: 599px) {
+  .app { --gutter-l: max(10px, env(safe-area-inset-left, 0px)); --gutter-r: max(10px, env(safe-area-inset-right, 0px)); }
+  .bar { gap: 6px; padding-block: 8px 2px; }
+  .bar-side { gap: 5px; }
+  .app .round-btn { min-width: 46px; height: 46px; padding: 0 6px; font-size: 1.05rem; }
+  .round-btn svg { width: 26px; height: 26px; }
+  .score { gap: 3px; padding: 4px 9px 4px 5px; font-size: 1.3rem; }
+  .score svg { width: 27px; height: 27px; }
+  .controls { flex: 1 1 auto; flex-wrap: nowrap; gap: 5px; }
+  .chip { min-height: 46px; padding: 3px 9px; font-size: 0.85rem; justify-content: center; line-height: 1; }
+  .chip-lvl { font-size: 0.75rem; white-space: nowrap; }
+  .chip > span:not(.chip-lvl):not(.dots) { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dots { margin-top: 2px; gap: 3px; }
+  .dots i { width: 8px; height: 8px; }
+  .instruction { max-width: calc(100% - 20px); padding: 4px 14px; gap: 9px; font-size: clamp(1.2rem, 5.4vw, 1.55rem); }
+  .instruction svg { width: 26px; height: 26px; }
+  .stage { padding-block: 12px 6px; }
+  .ground { gap: 10px; padding-top: 14px; padding-bottom: max(14px, var(--safe-b)); }
+  .choice { width: clamp(74px, 23vw, 96px); border-radius: 22px; }
+  .choice.wide { width: auto; min-width: 44px; min-height: 60px; padding: 6px 12px; }
+  .check { height: 64px; padding: 0 26px; font-size: 1.7rem; }
+  .soft { height: 54px; }
+}
+@media (max-width: 400px) {
+  .chip > span:not(.chip-lvl):not(.dots) { display: none; }
+  .app .cmd-btn { min-width: 64px; padding: 5px 6px; }
+  .app .cmd-undo { min-width: 48px; width: 48px; }
+}
+
+/* ---------- 3. phone, on its side ---------- */
+@media (orientation: landscape) and (max-height: 520px) {
+  .app {
+    --side: calc(clamp(116px, 20vw, 184px) + env(safe-area-inset-right, 0px));
+    --top: 56px;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    grid-template-rows: var(--top) minmax(0, 1fr);
+    column-gap: 8px;
+  }
+  .app:has(> .ground:empty) { --side: 0px; }
+  .bar { display: contents; }
+  .bar-side { grid-area: 1 / 1; z-index: 3; align-self: center; gap: 6px; margin-left: var(--gutter-l); }
+  .instruction {
+    grid-area: 1 / 2; align-self: center; margin: 0; max-width: 100%; max-height: 50px;
+    padding: 2px 12px; gap: 8px; line-height: 1; font-size: clamp(1rem, 2.4vw, 1.3rem);
+  }
+  .instruction svg { width: 22px; height: 22px; }
+  .controls { grid-area: 1 / 3; z-index: 3; align-self: center; flex-wrap: nowrap; gap: 5px; }
+  #soundBtn { grid-area: 1 / 4; z-index: 3; align-self: center; margin-right: var(--gutter-r); }
+  .app .round-btn { min-width: 46px; height: 46px; padding: 0 6px; font-size: 1.05rem; }
+  .round-btn svg { width: 26px; height: 26px; }
+  .score { gap: 3px; padding: 4px 9px 4px 5px; font-size: 1.2rem; }
+  .score svg { width: 25px; height: 25px; }
+  .chip { min-height: 46px; justify-content: center; padding: 2px 10px; line-height: 1; }
+  .chip-lvl { font-size: 0.75rem; white-space: nowrap; }
+  .chip > span:not(.chip-lvl):not(.dots) { display: none; }
+  .dots { margin-top: 3px; gap: 3px; }
+  .dots i { width: 8px; height: 8px; }
+
+  .stage {
+    grid-area: 2 / 1 / 3 / -1; margin-right: var(--side);
+    padding-block: 8px max(8px, var(--safe-b)); padding-right: 12px;
+  }
+  .app:has(> .ground:empty) .stage { padding-right: var(--gutter-r); }
+
+  .ground {
+    position: absolute; top: var(--top); right: 0; bottom: 0; width: var(--side); min-height: 0;
+    flex-direction: column; flex-wrap: nowrap; gap: 8px;
+    border-top: 0; border-left: 7px solid var(--grass-dark); border-radius: 30px 0 0 0;
+    padding: 10px max(8px, env(safe-area-inset-right, 0px)) max(10px, var(--safe-b)) 8px;
+  }
+  .ground:empty { display: none; }
+  #ground > button {
+    flex: 0 1 84px; width: 100%; max-width: 150px; height: auto; min-width: 0; min-height: 44px; aspect-ratio: auto;
+  }
+  #ground > .choice { padding: 2px 6px; border-radius: 20px; font-size: clamp(1.7rem, 8vh, 2.6rem); }
+  #ground > .choice.wide { font-size: clamp(1rem, 2.5vw, 1.4rem); line-height: 1; }
+  #ground > .choice.pic { display: flex; justify-content: center; font-size: 1rem; line-height: 1; overflow: hidden; }
+  #ground > .choice svg { flex: 0 1 auto; min-height: 0; max-width: 100%; max-height: 100%; }
+  #ground > .choice > span { min-height: 0; }
+  #ground > .check, #ground > .soft { flex-basis: 64px; padding: 0 6px; justify-content: center; font-size: 1.3rem; }
+  #ground > .check svg { width: 26px; height: 26px; }
+  #ground > .cmd-btn { flex-basis: 58px; flex-direction: row; justify-content: center; gap: 4px; padding: 0 4px; }
+  #ground > .cmd-btn svg { width: 28px; height: 28px; }
+  #ground > .cmd-undo { flex-basis: 48px; }
+
+  #ground > .tray { flex-direction: column; flex-wrap: nowrap; gap: 4px; width: 100%; max-height: 100%; }
+  #ground > .tray .box { width: min(76px, 17vh); }
+  #ground > .tray .sign { font-size: 1.6rem; line-height: 0.8; }
+  #ground > .tray:has(.box.sm) { flex-direction: row; flex-wrap: wrap; }
+  #ground > .tray .box.sm { width: min(60px, 15vh, 50% - 4px); }
+  #ground > .bubbles-sum { flex-direction: column; gap: 2px; font-size: clamp(1.4rem, 7vh, 2.2rem); line-height: 0.8; }
+  #ground > .bubbles-sum > .bubbles-slot, #ground > .bubbles-sum > .bubbles-goal { min-width: 76px; height: min(56px, 15vh); }
+  #ground > .sorting-basket { flex: 1 1 0; max-width: none; padding: 4px; gap: 1px; overflow: hidden; }
+  #ground .sorting-label { font-size: 1rem; }
+  #ground .sorting-mini { width: 22px; }
+  #ground .sorting-bsvg { height: 18px; }
+  #ground > .myday-btn { flex-direction: row; gap: 4px; }
+  #ground > .myday-btn svg { width: 42%; max-height: 100%; }
+  #ground > .myday-btn span { flex: 1; font-size: 0.85rem; }
+  #ground > .myday-slot { flex: 1 1 0; width: 100%; min-height: 0; max-height: 92px; font-size: 0.85rem; }
+}
+
+/* ---------- 4. boards fill the stage ---------- */
+@supports (container-type: size) {
+  .stage { container: stage / size; }
+  body[data-route=""] .stage { container: none; }
+
+  .sky-row .float { width: min(28cqw, 40cqh, 200px); }
+
+  .app .frames { --cell: clamp(30px, min((100cqw - 26px) / 5, (100cqh - 26px) / 2), 92px); }
+  .app .frames:has(> :nth-child(2)) { --cell: clamp(30px, min((100cqw - 26px) / 5, (100cqh - 60px) / 4), 92px); }
+  .app .pv { --c: clamp(12px, min((100cqh - 118px) / 10, (100cqw - 112px) / 13), 28px); }
+  .app .wire { width: calc(var(--b) * 12.6); }
+  .app .rack.size20 { --b: clamp(22px, min((100cqw - 44px) / 12.6, (100cqh - 34px) / 2.8), 50px); }
+  .app .rack.size100 { --b: clamp(18px, min((100cqw - 44px) / 12.6, (100cqh - 32px) / 13.7), 38px); }
+  .app .bead::after { content: ""; position: absolute; inset: calc(var(--b) * -0.17) 0; }
+  /* short and wide: the hundred square's cells become wider than they are tall, so they stay easy to hit */
+  .app .hsq {
+    --sq: min(56px, (100cqw - 28px) / 10, (100cqh - 28px) / 5.8);
+    --sqh: min(var(--sq), (100cqh - 28px) / 10);
+    grid-auto-rows: var(--sqh);
+  }
+  .app .hsq button { font-size: max(12px, min(var(--sqh) * 0.62, var(--sq) * 0.44)); }
+  .app .clockface { width: min(100cqw, 100cqh, 400px); }
+  .app .clockwrap:has(.hand-row) .clockface { width: min(100cqw, 100cqh - 76px, 400px); }
+  .app .share-big { width: min(100cqw, 100cqh, 420px); }
+  .app .share-card { width: clamp(88px, (100cqw - 34px) / 3, 220px); }
+  .app .balance { width: min(100cqw, 620px, (100cqh - 56px) * 1.66); }
+  .app .hunt { width: min(100cqw, 820px, 100cqh * 1.565); }
+  .app .shape-big { width: min(100cqw, 100cqh, 340px); }
+  .app .riddle-mark { width: min(60cqw, 100cqh, 220px); font-size: min(40cqw, 62cqh, 140px); }
+  .app .robot-grid { width: min(100cqw, 100cqh - 96px, 480px); }
+  .app .ladybird { width: min(100cqw, 100cqh, 400px); }
+  .app .farm { width: min(100cqw, 760px, (100cqh - 200px) * 1.87); }
+  .app .glass-big { width: min(56cqw, (100cqh - 76px) * 0.75, 240px); }
+  .app .cherry { width: min(100cqw, 100cqh * 1.18, 460px); }
+  .app .cherry.small { width: min(80cqw, (100cqh - 92px) * 1.18, 300px); }
+  .app .scale-wrap { width: min(100cqw, 100cqh * 0.78, 360px); }
+  .app .scale-num { font-size: 22px; }
+  .app .sym-wrap { width: min(100cqw - 8px, 100cqh - 16px, 460px); }
+  .app .sym-card { width: clamp(96px, min((100cqw - 34px) / 3, 80cqh), 220px); }
+  .app .tenbridge { --tenbridge-cell: clamp(30px, min((100cqw - 26px) / 5, (100cqh - 176px) / 4), 76px); }
+  .app .tenbridge-frames { grid-template-columns: none; }
+  .app .bubbles-b { --size: clamp(64px, min(22cqw, 27cqh), 136px); }
+  .app .dice-big .dice-face { width: min(80cqw, 90cqh, 260px); }
+  .app .words-card { max-height: 100cqh; }
+  .app .bed { width: min(100cqw, var(--cols) * 54px + 26px, 620px); }
+  .app .race-lane { height: clamp(36px, 12cqh, 70px); }
+  .app .glass-btn { width: clamp(88px, (100cqw - 30px) / 3, 180px); }
+  .app .train { --car: min(80px, (100cqw - 4px) / var(--per) - 4px); }
+}
+
+/* ---------- 5. short, wide stage: put things side by side ---------- */
+@container stage (min-aspect-ratio: 3/2) {
+  .app .frames:has(> :nth-child(2)) {
+    grid-auto-flow: column;
+    --cell: clamp(30px, min((100cqw - 68px) / 10, (100cqh - 26px) / 2), 92px);
+  }
+  .app .tenbridge { --tenbridge-cell: clamp(28px, min((100cqw - 68px) / 10, (100cqh - 92px) / 2), 76px); }
+  .app .tenbridge-frames { grid-template-columns: auto auto; gap: 16px; }
+  .app .tenbridge-pile { max-width: 100cqw; min-height: 56px; gap: 5px; }
+  .app .tenbridge-pc { width: 46px; }
+  .app .fractions-plate { width: min(150px, (100cqw - 40px) / 4, 100cqh - 70px); height: min(150px, (100cqw - 40px) / 4, 100cqh - 70px); }
+
+  .app .shop:has(.shelf) { grid-template-columns: auto minmax(0, 1fr); width: 100%; max-width: 720px; align-items: center; }
+  .app .shop > .shelf { grid-row: 1 / 3; flex-direction: column; gap: 4px; padding: 8px 14px; }
+  .app .shop > .shelf svg { width: min(96px, 32cqh); }
+
+  .app .clockwrap:has(.hand-row) { grid-auto-flow: column; align-items: center; gap: 20px; }
+  .app .clockwrap:has(.hand-row) .clockface { width: min(52cqw, 100cqh, 400px); }
+  .app .hand-row { flex-direction: column; flex-wrap: nowrap; }
+
+  .app .robot-wrap { grid-template-columns: auto minmax(0, 1fr); align-items: center; }
+  .app .robot-grid { width: min(62cqw, 100cqh, 480px); }
+  .app .prog-strip { align-content: center; min-height: min(80cqh, 160px); }
+
+  .app .farm { grid-template-columns: minmax(0, 57fr) minmax(0, 43fr); align-items: center; width: min(100cqw, 1080px, 100cqh * 3.3); }
+  .app .farm .picto { width: min(30px, 4cqw); }
+  .app .farm .chart { padding: 6px; }
+  .app .farm .chart-row { gap: 4px; }
+  .app .farm .chart-key { width: 40px; padding-right: 2px; }
+  .app .farm .chart-val { height: auto; min-height: 36px; }
+  .app .farm .chart-tally .chart-val { height: 36px; } /* the tally drawing is as tall as its row */
+
+  .app .bag { width: min(150px, (100cqw - 52px) / 5, 60cqh); }
+  .app .bags:not(:has(> :nth-child(4))) .bag { width: min(150px, (100cqw - 30px) / 3, 58cqh); }
+
+  .app .fill-wrap { grid-auto-flow: column; align-items: center; gap: 24px; }
+  .app .glass-big { width: min(40cqw, 75cqh, 240px); }
+  .app .pour-row { flex-direction: column; }
+
+  .app .arrays:has(.steppers) { grid-template-columns: auto auto; justify-content: center; column-gap: 24px; align-items: center; }
+  .app .arrays:has(.steppers) .bed { width: min(62cqw, var(--cols) * 54px + 26px); }
+  .app .steppers { flex-direction: column; }
+
+  .app .cherry-eq { grid-auto-flow: column; align-items: center; gap: 20px; }
+  .app .cherry.small { width: min(42cqw, 100cqh * 1.18, 300px); }
+
+  .app .bear-me { width: min(28cqw, 70cqh, 190px); }
+  .app .bear-plate { --bear-c: clamp(26px, min(9cqw, 17cqh), 60px); }
+  .app .race-lane { height: clamp(36px, 17cqh, 70px); }
+  .app .race-p3 .race-block { height: 44px; }
+  .app .race:has(.race-podium) { grid-template-columns: minmax(0, 1fr) auto; align-items: center; width: 100%; }
+  .app .race-podium .race-step { width: clamp(52px, 10cqw, 96px); }
+
+  .app .sorting-wrap { grid-template-columns: auto minmax(0, 220px); align-items: center; justify-content: center; }
+  .app .sorting-queue { flex-wrap: wrap; }
+}

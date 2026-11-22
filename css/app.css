@@ -424,8 +424,8 @@ button:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
 .measure .snake-hit { cursor: pointer; }
 .unit-cube { fill: #8ad6ff; stroke: var(--cube-dark); stroke-width: 2.5; }
 .start-line { stroke: var(--pink); stroke-width: 3; stroke-dasharray: 6 5; }
-.ruler-num { font-family: var(--font-display); font-weight: 800; font-size: 20px; fill: var(--ink); }
-.ruler-unit { font-family: var(--font-display); font-weight: 800; font-size: 16px; fill: var(--muted); }
+.ruler-num { font-family: var(--font-display); font-weight: 800; font-size: 26px; fill: var(--ink); }
+.ruler-unit { font-family: var(--font-display); font-weight: 800; font-size: 24px; fill: var(--muted); }
 
 /* ---------- ladybird doubles ---------- */
 .ladybird { width: min(70vw, 44vh, 340px); }
@@ -459,14 +459,17 @@ button:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
 @media (max-width: 480px) { .picto { width: 30px; } }
 
 /* ---------- pattern train ---------- */
-.train { display: flex; flex-wrap: wrap; gap: 6px 4px; align-items: flex-end; justify-content: center; max-width: 100%; }
-.engine {
-  width: clamp(48px, 12vw, 76px); aspect-ratio: 1; background: var(--counter); border: 4px solid var(--ink);
-  border-radius: 12px 26px 8px 8px; position: relative;
+.train {
+  --per: var(--half); --car: 48px;
+  display: flex; flex-wrap: wrap; gap: 30px 4px; padding-top: 28px; align-items: flex-end;
+  width: calc((var(--car) + 4px) * var(--per));
 }
-.chimney { position: absolute; left: 18%; top: -38%; width: 26%; height: 40%; background: var(--ink); border-radius: 4px 4px 0 0; }
+@container stage (min-aspect-ratio: 3/2) { .app .train { --per: var(--n); } }
+@media (min-width: 900px) { .train { --per: var(--n); } }
+.engine { width: var(--car); flex: none; margin-bottom: -10px; }
+.engine svg { display: block; width: 100%; height: auto; }
 .car {
-  width: clamp(48px, 12vw, 76px); aspect-ratio: 1; background: var(--paper); border: 4px solid var(--ink);
+  width: var(--car); aspect-ratio: 1; background: var(--paper); border: 4px solid var(--ink);
   border-radius: 10px; display: grid; place-items: center; box-shadow: 0 5px 0 var(--lift);
 }
 .car svg { width: 82%; height: auto; }
@@ -570,7 +573,7 @@ button:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
   background: var(--ink); padding: 3px; border-radius: 12px; box-shadow: 0 6px 0 var(--lift);
 }
 .sym .sq { aspect-ratio: 1; border: 0; padding: 0; border-radius: 4px; background: var(--paper); }
-.sym .sq:disabled { cursor: default; }
+span.sq { display: block; }
 .sym .mirror { position: absolute; top: -10px; bottom: -10px; left: 50%; width: 4px; margin-left: -1px; background: repeating-linear-gradient(var(--pink) 0 10px, transparent 10px 16px); pointer-events: none; }
 .sym-choices { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
 .sym-card { border: 0; background: none; padding: 0; width: clamp(96px, 27vw, 200px); }

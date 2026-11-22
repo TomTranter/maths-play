@@ -27,7 +27,9 @@ const symmetry = {
     let cells = "";
     for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) {
       const v = c < half ? left[r][c] : right[r][c - half];
-      cells += `<button class="sq${c === half - 1 ? " edge" : ""}" data-r="${r}" data-c="${c}" ${v ? `style="background:${SYM_COLS[v - 1]}"` : ""} ${clickable && c >= half ? "" : "disabled"} aria-label="Square"></button>`;
+      const attrs = `class="sq${c === half - 1 ? " edge" : ""}" data-r="${r}" data-c="${c}" ${v ? `style="background:${SYM_COLS[v - 1]}"` : ""}`;
+      // only squares you can paint are buttons: the level 3 cards are buttons themselves, and buttons can't nest
+      cells += clickable && c >= half ? `<button ${attrs} aria-label="Square"></button>` : `<span ${attrs}></span>`;
     }
     return `<div class="sym" style="--n:${size}">${cells}<span class="mirror"></span><span class="body"></span></div>`;
   },

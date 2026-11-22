@@ -25,9 +25,9 @@ Maths games for 5–7 year olds (UK Year 1–2 curriculum). Plain HTML/CSS/JS se
 ## Kid-facing rules
 
 Every instruction is spoken; wrong answers never cost stars (`miss(hint)`); win lines start with "Yes!" (swapped for
-varied praise); every round must be possible with what's on screen; tap targets ≥ ~44px; no scrolling at 400×800;
+varied praise); every round must be possible with what's on screen; tap targets ≥ ~44px; fits at 375×667 and 568×320 (boards sized in cqw/cqh; css/layout.css, js/fit.js as backstop);
 UK wording ("take away", "p" for pence, "colour").
 
 ## Verify
 
-Self-test passes, then play the changed game by hand at 400×800 and 1024×768. Use one browser at a time.
+Self-test passes, then play the changed game by hand at 375×667, 568×320 and 1024×768 (and look at every level: the test taps the answer directly). Use one browser at a time.

@@ -28,7 +28,7 @@ The full contract is [docs/ADDING_A_GAME.md](../../../docs/ADDING_A_GAME.md); th
    nice -n 10 uv run tools/make_voice.py
    ```
 7. **Self-test:** `python3 -m http.server 8000`, open `http://localhost:8000/?selftest=<id>`. Every level must
-   show `ok`, with no missing recordings. Then play it by hand at phone size (400×800) and tablet size (1024×768).
+   show `ok`, with no missing recordings. Run it at 375×667 and again at 568×320 (phone on its side), then play it by hand at both and at 1024×768.
 8. **Publish** with the `publish` skill when the parent is happy.
 
 ## Checklist before calling it done
@@ -39,7 +39,7 @@ The full contract is [docs/ADDING_A_GAME.md](../../../docs/ADDING_A_GAME.md); th
 | Every spoken sentence is in `voiceLines()` | Otherwise that line falls back to the device's robotic voice. The self-test lists any it hears that aren't declared. |
 | Wrong answers only give a hint (`miss`) | Children must never lose stars. |
 | Win lines start with `Yes!` | The app swaps it for varied praise. |
-| Tap targets ≥ 44px and no scrolling at 400×800 | Small fingers, small screens. |
+| Tap targets ≥ 44px; fits at 375×667 and 568×320; size boards in `cqw`/`cqh`; no button inside a button | Small fingers, small screens. |
 | UK wording | "colour", "take away", "p" for pence, "half past". |
 
 ## Common mistakes

@@ -15,8 +15,10 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="preload" href="fonts/baloo2-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/scenery.css">
 </head>
-<body>
+<body data-route="">
   <!-- Shared coin gradients (referenced by the Coin Shop). -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
@@ -26,6 +28,8 @@
   </svg>
 
   <div class="app" id="app">
+    <i class="sun" aria-hidden="true"></i>
+    <i class="hills" aria-hidden="true"></i>
     <div class="cloud" style="top:16%;width:120px;height:34px;animation-delay:-20s"></div>
     <div class="cloud" style="top:40%;width:90px;height:26px;animation-delay:-48s;animation-duration:90s"></div>
 
@@ -92,6 +96,7 @@
   <script src="js/games/sorting.js"></script>
   <script src="js/games/tenbridge.js"></script>
   <script src="js/games/words.js"></script>
+  <script src="js/fit.js"></script>
   <script src="js/main.js"></script>
   <script src="js/selftest.js"></script>
 </body>

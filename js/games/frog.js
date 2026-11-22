@@ -2,12 +2,15 @@
 // NC Y1: add and subtract one-digit and two-digit numbers to 20, including zero; read +, − and = signs.
 "use strict";
 
-const FROG = `<g aria-hidden="true">
-  <ellipse cx="0" cy="-16" rx="24" ry="17" fill="#3fae49" stroke="#23702b" stroke-width="3"/>
-  <circle cx="-11" cy="-33" r="9" fill="#3fae49" stroke="#23702b" stroke-width="3"/>
-  <circle cx="11" cy="-33" r="9" fill="#3fae49" stroke="#23702b" stroke-width="3"/>
-  <circle cx="-11" cy="-34" r="4.5" fill="#1d3557"/><circle cx="11" cy="-34" r="4.5" fill="#1d3557"/>
-  <path d="M-10 -12 q10 8 20 0" fill="none" stroke="#23702b" stroke-width="3" stroke-linecap="round"/>
+const FROG = `<g aria-hidden="true" stroke="#1d3557" stroke-width="3" stroke-linejoin="round">
+  <path d="M-20 -14 q-20 4 -14 16 h20z M20 -14 q20 4 14 16 h-20z" fill="#2f9e44"/>
+  <path d="M-22 -38 C-34 -14 -22 1 0 1 C22 1 34 -14 22 -38 Z" fill="#58c85f"/>
+  <ellipse cx="0" cy="-12" rx="14" ry="10" fill="#d8f5a2" stroke="none"/>
+  <path d="M-27 -39 a12 12 0 1 1 22 -8 h10 a12 12 0 1 1 22 8 q3 18 -27 18 q-30 0 -27 -18z" fill="#58c85f"/>
+  <circle cx="-15" cy="-49" r="7" fill="#fff" stroke-width="2"/><circle cx="15" cy="-49" r="7" fill="#fff" stroke-width="2"/>
+  <circle cx="-14" cy="-49" r="3.5" fill="#1d3557" stroke="none"/><circle cx="16" cy="-49" r="3.5" fill="#1d3557" stroke="none"/>
+  <path d="M-13 -35 q13 10 26 0" fill="none" stroke-linecap="round"/>
+  <circle cx="-21" cy="-36" r="3.5" fill="#ff8fab" stroke="none"/><circle cx="21" cy="-36" r="3.5" fill="#ff8fab" stroke="none"/>
 </g>`;
 const PAD_GAP = 60, PAD_Y = 168, PAD_X0 = 32;
 const padX = (i) => PAD_X0 + i * PAD_GAP;
@@ -44,14 +47,16 @@ const frog = {
     const pads = Array.from({ length: 11 }, (_, i) => {
       const n = lo + i, x = padX(i);
       return `<g>
-        <ellipse cx="${x}" cy="${PAD_Y}" rx="28" ry="21" class="pad${n === a ? " start-pad" : ""}"/>
+        <path d="M${x + 5} ${PAD_Y - 23} A28 24 0 1 1 ${x - 5} ${PAD_Y - 23} L${x} ${PAD_Y - 16} Z" class="pad${n === a ? " start-pad" : ""}"/>
         <text class="padnum" x="${x}" y="${PAD_Y + 11}" text-anchor="middle">${n}</text>
-        <rect class="hit" data-n="${n}" x="${x - PAD_GAP / 2}" y="40" width="${PAD_GAP}" height="170"/>
+        <rect class="hit" data-n="${n}" x="${x - PAD_GAP / 2}" y="0" width="${PAD_GAP}" height="250"/>
       </g>`;
     }).join("");
-    const river = h(`<div class="river"><svg viewBox="0 0 ${PAD_X0 * 2 + PAD_GAP * 10} 215" role="img" aria-label="Number line from ${lo} to ${lo + 10}">
-      <rect class="water" x="0" y="140" width="${PAD_X0 * 2 + PAD_GAP * 10}" height="58" rx="26"/>
-      <path class="ripple" d="M20 160 q20 -6 40 0 M300 186 q20 -6 40 0 M540 158 q20 -6 40 0"/>
+    const river = h(`<div class="river"><svg viewBox="0 0 ${PAD_X0 * 2 + PAD_GAP * 10} 250" role="img" aria-label="Number line from ${lo} to ${lo + 10}">
+      <path class="bank" d="M0 130 q40 -18 84 -4 q70 -22 140 0 q90 -20 160 -2 q80 -22 150 2 q70 -18 130 4 v22 h-664z"/>
+      ${[22, 208, 452, 636].map((x) => `<path class="reed" d="M${x} 134 v-40 M${x + 10} 134 q0 -20 8 -28"/><rect class="reed-top" x="${x - 5}" y="78" width="10" height="24" rx="5"/>`).join("")}
+      <rect class="water" x="0" y="130" width="${PAD_X0 * 2 + PAD_GAP * 10}" height="104" rx="30"/>
+      <path class="ripple" d="M20 208 q20 -7 40 0 t40 0 M280 214 q20 -7 40 0 t40 0 M530 208 q20 -7 40 0 t40 0"/>
       <g class="arcs"></g>
       ${pads}
       <g class="frogpos" style="pointer-events:none">${FROG}</g>
@@ -70,10 +75,10 @@ const frog = {
   },
   place(n) {
     const x = padX(n - task.lo);
-    task.frogEl.style.transform = `translate(${x}px, ${PAD_Y - 4}px)`;
+    task.frogEl.style.transform = `translate(${x}px, ${PAD_Y - 23}px)`;
   },
   async hop(from, to) {
-    const t = task, x1 = padX(from - t.lo), x2 = padX(to - t.lo), y = PAD_Y - 4;
+    const t = task, x1 = padX(from - t.lo), x2 = padX(to - t.lo), y = PAD_Y - 23;
     t.hops++;
     const mid = (x1 + x2) / 2;
     const arc = document.createElementNS("http://www.w3.org/2000/svg", "path");

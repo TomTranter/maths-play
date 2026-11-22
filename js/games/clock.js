@@ -14,9 +14,10 @@ function clockFace() {
   }).join("");
   return `<svg class="clockface" viewBox="0 0 200 200" role="img" aria-label="Clock">
     <circle cx="100" cy="100" r="97" fill="#ffffff" stroke="#1d3557" stroke-width="5"/>
-    ${ticks}${digits}
-    <g class="hand hour"><line x1="100" y1="108" x2="100" y2="54" stroke-width="10" stroke-linecap="round"/></g>
-    <g class="hand minute"><line x1="100" y1="112" x2="100" y2="22" stroke-width="6" stroke-linecap="round"/></g>
+    ${ticks}
+    <g class="hand hour"><line x1="100" y1="108" x2="100" y2="54" stroke-width="13" stroke-linecap="round"/></g>
+    <g class="hand minute"><line x1="100" y1="112" x2="100" y2="22" stroke-width="5" stroke-linecap="round"/></g>
+    ${digits}
     <circle cx="100" cy="100" r="7" fill="#1d3557"/>
   </svg>`;
 }

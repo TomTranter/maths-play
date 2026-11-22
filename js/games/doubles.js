@@ -6,16 +6,26 @@
 // Spot centres on the left wing (x < 0); the right wing mirrors them. Ladybird centred on (0, 0).
 const SPOTS = [[-38, -22], [-58, 4], [-34, 18], [-20, -40], [-62, -26], [-16, 0], [-44, 44], [-20, 34], [-70, 28], [-52, -48]];
 const ladybirdSVG = (left, right, hit = false) => `<svg viewBox="-110 -110 220 220" aria-hidden="true">
-  <circle cx="0" cy="-82" r="26" fill="#1d3557"/><circle cx="-10" cy="-88" r="5" fill="#fff"/><circle cx="10" cy="-88" r="5" fill="#fff"/>
-  <path d="M-14 -104 q-10 -14 -20 -12 M14 -104 q10 -14 20 -12" stroke="#1d3557" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M-70 -20 l-28 -16 M-84 24 h-22 M-66 68 l-26 18 M70 -20 l28 -16 M84 24 h22 M66 68 l26 18" stroke="#1d3557" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <path d="M-14 -96 q-8 -10 -22 -8 M14 -96 q8 -10 22 -8" stroke="#1d3557" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <circle cx="-38" cy="-103" r="6" fill="#ffd23f" stroke="#1d3557" stroke-width="3"/><circle cx="38" cy="-103" r="6" fill="#ffd23f" stroke="#1d3557" stroke-width="3"/>
+  <ellipse cx="0" cy="-73" rx="36" ry="28" fill="#1d3557"/>
+  <circle cx="-13" cy="-82" r="9" fill="#fff"/><circle cx="13" cy="-82" r="9" fill="#fff"/>
+  <circle cx="-12" cy="-81" r="4.5" fill="#1d3557"/><circle cx="14" cy="-81" r="4.5" fill="#1d3557"/>
+  <path d="M-9 -67 q9 7 18 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <circle cx="-23" cy="-69" r="4" fill="#ff8fab"/><circle cx="23" cy="-69" r="4" fill="#ff8fab"/>
   <path d="M0 -64 A86 86 0 0 0 0 100 A86 86 0 0 0 0 -64 Z" fill="#1d3557"/>
-  <path class="wing-l" d="M-2 -62 C -60 -62, -96 -10, -84 34 C -74 76, -30 96, -2 98 Z" fill="#ff4d6d" stroke="#1d3557" stroke-width="4"/>
-  <path class="wing-r${hit ? " wing-tap" : ""}" d="M2 -62 C 60 -62, 96 -10, 84 34 C 74 76, 30 96, 2 98 Z" fill="#ff4d6d" stroke="#1d3557" stroke-width="4"/>
+  <path class="wing-l" d="M-2 -62 C -60 -62, -96 -10, -84 34 C -74 76, -30 96, -2 98 Z" fill="#f03e5d" stroke="#1d3557" stroke-width="4"/>
+  <path class="wing-r${hit ? " wing-tap" : ""}" d="M2 -62 C 60 -62, 96 -10, 84 34 C 74 76, 30 96, 2 98 Z" fill="#f03e5d" stroke="#1d3557" stroke-width="4"/>
+  <path d="M-79 26 q-4 -48 40 -72 M79 26 q4 -48 -40 -72" stroke="#ff9aae" stroke-width="6" fill="none" stroke-linecap="round" style="pointer-events:none"/>
   ${SPOTS.slice(0, left).map(([x, y]) => `<circle cx="${x}" cy="${y}" r="11" fill="#1d3557"/>`).join("")}
-  ${SPOTS.slice(0, right).map(([x, y], i) => `<circle class="spot-r" data-i="${i}" cx="${-x}" cy="${y}" r="11" fill="#1d3557"/>`).join("")}
+  ${SPOTS.slice(0, right).map(([x, y], i) => `<circle class="spot-r" data-i="${i}" cx="${-x}" cy="${y}" r="11" fill="#1d3557"${hit ? ' stroke="transparent" stroke-width="14"' : ""}/>`).join("")}
 </svg>`;
 const SOCK_COLS = ["#ff4d6d", "#3aa6e8", "#2ec27e", "#ffd23f", "#9b5de5", "#ff9f1c"];
-const sockSVG = (c) => `<svg viewBox="0 0 40 56" aria-hidden="true"><path d="M8 2 h18 v30 l10 10 a8 8 0 0 1 -6 13 h-14 a8 8 0 0 1 -8 -8 z" fill="${c}" stroke="#1d3557" stroke-width="3" stroke-linejoin="round"/><rect x="8" y="2" width="18" height="8" fill="#fff" opacity=".6"/></svg>`;
+const sockSVG = (c) => `<svg viewBox="0 0 40 56" aria-hidden="true">
+  <path d="M8 2 h18 v28 l10 10 a8 8 0 0 1 -6 13 h-14 a8 8 0 0 1 -8 -8 z" fill="${c}" stroke="#1d3557" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M9.5 3.5 h15 v6 h-15z" fill="#fff" opacity=".75"/><path d="M9.5 17 h15 M9.5 24 h15" stroke="#fff" stroke-width="3" opacity=".6"/>
+  <path d="M9.5 37 q9 0 8 14 M32 39 q-9 4 -4 12" stroke="#1d3557" stroke-width="2.5" fill="none" opacity=".45"/></svg>`;
 
 const doubles = {
   id: "doubles", name: "Ladybird Doubles", strand: "Doubles, odd & even",

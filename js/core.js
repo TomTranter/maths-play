@@ -3,7 +3,7 @@
 // are shared with the game scripts that load after it.
 "use strict";
 
-const APP_VERSION = "3.0"; // shown in the grown-ups panel, to check a tablet has the latest update
+const APP_VERSION = "3.1"; // shown in the grown-ups panel, to check a tablet has the latest update
 const STORE_KEY = "balloon-pop-maths"; // original key, so existing scores carry over
 const ROUNDS_PER_LEVEL = 4;
 const COLORS = [
@@ -30,7 +30,13 @@ function addGame(game) {
 }
 
 const $ = (id) => document.getElementById(id);
-const h = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; };
+const markupErrors = new Set(); // reported by ?selftest
+const h = (html) => {
+  const t = document.createElement("template"); t.innerHTML = html.trim();
+  // more than one top-level element usually means broken markup, such as a button inside a button
+  if (t.content.childElementCount > 1) markupErrors.add(`h() lost part of: ${html.trim().slice(0, 70)}`);
+  return t.content.firstElementChild;
+};
 const rand = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
 const shuffle = (arr) => { for (let i = arr.length - 1; i > 0; i--) { const j = rand(0, i); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; };
 const pick = (arr) => arr[rand(0, arr.length - 1)];
@@ -447,6 +453,7 @@ function show() {
   try { speechSynthesis.cancel(); } catch {}
   const id = location.hash.slice(1);
   route = GAMES[id] ? id : "";
+  document.body.dataset.route = route;
   renderControls();
   if (!route) { showHome(); return; }
   $("homeBtn").hidden = false;

@@ -51,7 +51,7 @@ const MYDAY_EVENTS = [
       ${[[20, 12], [44, 8], [60, 20], [32, 26]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.8" fill="#fff"/>`).join("")}
       <rect x="8" y="48" width="84" height="18" rx="3" fill="#9b5de5" stroke="#fff" stroke-width="2"/><rect x="8" y="38" width="8" height="36" rx="2" fill="#b07a43"/>
       <ellipse cx="26" cy="46" rx="9" ry="5" fill="#fff"/><circle cx="28" cy="40" r="8" fill="#f4c29c" stroke="#fff" stroke-width="1.5"/>
-      <path d="M24 40 q2 2 4 0 M30 40 q2 2 4 0" stroke="#1d3557" stroke-width="1.5" fill="none"/><text x="42" y="36" font-size="10" font-weight="800" fill="#fff" font-family="Baloo 2, sans-serif">z z</text>` },
+      <path d="M24 40 q2 2 4 0 M30 40 q2 2 4 0" stroke="#1d3557" stroke-width="1.5" fill="none"/><text x="40" y="36" font-size="14" font-weight="800" fill="#fff" font-family="Baloo 2, sans-serif">z z</text>` },
 ];
 const MYDAY_PERIODS = ["morning", "afternoon", "evening"];
 const MYDAY_STEPS = ["first", "next", "last"];

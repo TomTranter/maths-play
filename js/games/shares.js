@@ -81,7 +81,7 @@ const shares = {
     } else {
       const parts = target === 2 ? pick([2, 4]) : pick([4, 8]);
       t.need = parts / target;
-      t.shapeKind = pick(Object.keys(SHARE_KINDS));
+      t.shapeKind = parts === 8 ? "pizza" : pick(Object.keys(SHARE_KINDS)); // eight strips are too thin to tap
       t.cuts = equalCuts(parts);
       t.on = new Set();
       const big = h('<div class="share-big"></div>');

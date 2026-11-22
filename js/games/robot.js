@@ -10,12 +10,15 @@ const ARROW = {
   L: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M30 34 V20 a8 8 0 0 0 -8 -8 H16 V5 L4 15 L16 25 V18 H22 a2 2 0 0 1 2 2 V34 Z" fill="#1d3557"/></svg>',
   R: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M10 34 V20 a8 8 0 0 1 8 -8 H24 V5 L36 15 L24 25 V18 H18 a2 2 0 0 0 -2 2 V34 Z" fill="#1d3557"/></svg>',
 };
-const ROBOT_SVG = `<g class="robot-body">
-  <line x1="0" y1="-38" x2="0" y2="-28" stroke="#1d3557" stroke-width="4"/><circle cx="0" cy="-40" r="6" fill="#ff4d6d" stroke="#1d3557" stroke-width="3"/>
-  <rect x="-30" y="-28" width="60" height="56" rx="14" fill="#3aa6e8" stroke="#1d3557" stroke-width="4"/>
-  <circle cx="-12" cy="-10" r="8" fill="#fff" stroke="#1d3557" stroke-width="3"/><circle cx="12" cy="-10" r="8" fill="#fff" stroke="#1d3557" stroke-width="3"/>
-  <circle cx="-12" cy="-12" r="3.5" fill="#1d3557"/><circle cx="12" cy="-12" r="3.5" fill="#1d3557"/>
-  <rect x="-14" y="8" width="28" height="7" rx="3.5" fill="#1d3557"/>
+const ROBOT_SVG = `<g class="robot-body" stroke="#1d3557" stroke-width="4" stroke-linejoin="round">
+  <rect x="-40" y="-26" width="18" height="60" rx="8" fill="#56627a"/><rect x="22" y="-26" width="18" height="60" rx="8" fill="#56627a"/>
+  <path d="M-38 -12 h14 M-38 4 h14 M-38 20 h14 M24 -12 h14 M24 4 h14 M24 20 h14" stroke-width="2.5"/>
+  <path d="M0 -49 L17 -24 H-17 Z" fill="#ffd23f"/>
+  <rect x="-28" y="-28" width="56" height="58" rx="17" fill="#3aa6e8"/>
+  <rect x="-22" y="-22" width="44" height="24" rx="11" fill="#d4f0ff" stroke-width="3"/>
+  <circle cx="-10" cy="-11" r="5" fill="#1d3557" stroke="none"/><circle cx="10" cy="-11" r="5" fill="#1d3557" stroke="none"/>
+  <circle cx="-8.5" cy="-13" r="1.8" fill="#fff" stroke="none"/><circle cx="11.5" cy="-13" r="1.8" fill="#fff" stroke="none"/>
+  <circle cx="0" cy="17" r="7" fill="#ff4d6d" stroke-width="3"/>
 </g>`;
 const STAR_PATH = (cx, cy, r) => Array.from({ length: 10 }, (_, i) => {
   const a = (Math.PI / 5) * i - Math.PI / 2, rr = i % 2 ? r * 0.45 : r;
@@ -73,7 +76,7 @@ const robot = {
 
     const cells = [];
     for (let y = 0; y < ROBOT_N; y++) for (let x = 0; x < ROBOT_N; x++) cells.push(`<rect x="${x * CELL + 3}" y="${y * CELL + 3}" width="${CELL - 6}" height="${CELL - 6}" rx="10" class="${(x + y) % 2 ? "cell-a" : "cell-b"}"/>`);
-    const rockSvg = rocks.map(([x, y]) => `<path class="rock" d="M${x * CELL + 18} ${y * CELL + 74} q-6 -26 16 -40 q14 -18 34 -4 q22 10 14 44 z"/>`).join("");
+    const rockSvg = rocks.map(([x, y]) => `<g transform="translate(${x * CELL} ${y * CELL})"><path class="rock" d="M14 78 L10 56 L28 28 L58 20 L86 40 L91 76 Q52 90 14 78 Z"/><path d="M30 34 L56 27 L70 37 L44 46 Z" fill="#d5dbe3"/><path d="M44 46 L40 70 M70 37 L78 62" stroke="#5d6470" stroke-width="3" stroke-linecap="round"/><path d="M16 84 l4 -14 l5 14 l5 -9 l4 9z" fill="#4a9a32"/></g>`).join("");
     const wrap = h(`<div class="robot-wrap">
       <svg class="robot-grid" viewBox="0 0 ${ROBOT_N * CELL} ${ROBOT_N * CELL}" role="img" aria-label="Robot grid">
         ${cells.join("")}${rockSvg}

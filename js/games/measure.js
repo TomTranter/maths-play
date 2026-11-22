@@ -11,10 +11,13 @@ const MEASURE_OBJS = ["pencil", "worm", "crayon", "train"];
 function measureObj(kind, x, y, len, color = "#ff4d6d") {
   const w = len * U;
   if (kind === "snake") {
-    return `<rect x="${x}" y="${y - 13}" width="${w - 10}" height="26" rx="13" fill="${color}" stroke="#1d3557" stroke-width="3"/>
-      ${Array.from({ length: Math.max(0, len - 1) }, (_, i) => `<circle cx="${x + 20 + i * U}" cy="${y}" r="4" fill="#fff" opacity=".6"/>`).join("")}
-      <circle cx="${x + w - 14}" cy="${y}" r="16" fill="${color}" stroke="#1d3557" stroke-width="3"/>
-      <circle cx="${x + w - 9}" cy="${y - 5}" r="4" fill="#1d3557"/><path d="M${x + w + 1} ${y + 3} l7 2 l-7 2" stroke="#d6336c" stroke-width="2" fill="none"/>`;
+    const end = x + w, neck = end - 24;
+    return `<path d="M${x} ${y} Q${x + 10} ${y - 16} ${x + 32} ${y - 15} H${neck} V${y + 15} H${x + 32} Q${x + 10} ${y + 16} ${x} ${y} Z" fill="${color}" stroke="#1d3557" stroke-width="3" stroke-linejoin="round"/>
+      ${Array.from({ length: Math.max(0, len - 1) }, (_, i) => `<path d="M${x + 28 + i * U} ${y - 11} l11 11 l-11 11 l-11 -11z" fill="#fff" opacity=".5"/>`).join("")}
+      <rect x="${end - 44}" y="${y - 23}" width="44" height="46" rx="20" fill="${color}" stroke="#1d3557" stroke-width="3"/>
+      <circle cx="${end - 25}" cy="${y - 8}" r="7" fill="#fff"/><circle cx="${end - 23}" cy="${y - 8}" r="3.6" fill="#1d3557"/>
+      <circle cx="${end - 10}" cy="${y - 8}" r="4" fill="#fff"/><circle cx="${end - 9}" cy="${y - 8}" r="2.4" fill="#1d3557"/>
+      <path d="M${end - 28} ${y + 8} q12 9 22 -1" stroke="#1d3557" stroke-width="3" fill="none" stroke-linecap="round"/>`;
   }
   if (kind === "pencil") {
     return `<rect x="${x}" y="${y - 13}" width="12" height="26" rx="4" fill="#f15bb5" stroke="#1d3557" stroke-width="3"/>
@@ -66,8 +69,8 @@ const measure = {
       const want = pick(many ? ["longest", "shortest"] : ["longer", "shorter"]);
       const pickIdx = want.startsWith("long") ? lens.indexOf(Math.max(...lens)) : lens.indexOf(Math.min(...lens));
       Object.assign(t, { cols, lens, want, answer: cols[pickIdx] });
-      const H = cols.length * 70 + 20;
-      const body = cols.map((c, i) => `<g class="snake-hit" data-c="${c}"><rect x="0" y="${10 + i * 70}" width="${13 * U}" height="60" fill="transparent"/>${measureObj("snake", 20, 40 + i * 70, lens[i], SNAKE_COLS[c])}</g>`).join("");
+      const H = cols.length * 104 + 20;
+      const body = cols.map((c, i) => `<g class="snake-hit" data-c="${c}"><rect x="0" y="${10 + i * 104}" width="${13 * U + 40}" height="100" fill="transparent"/>${measureObj("snake", 20, 60 + i * 104, lens[i], SNAKE_COLS[c])}</g>`).join("");
       const wrap = h(`<div class="measure"><svg viewBox="0 0 ${13 * U + 40} ${H}" role="img" aria-label="Snakes">${body}</svg></div>`);
       t.svg = wrap.querySelector("svg");
       t.svg.addEventListener("click", (e) => {
@@ -105,7 +108,7 @@ const measure = {
       ${measureObj(obj, 20 + s * U, 54, n)}
       <rect x="8" y="84" width="${15 * U + 24}" height="50" rx="6" fill="#fff3c4" stroke="#e0a800" stroke-width="3"/>${ticks}
       <line x1="${20 + s * U}" y1="30" x2="${20 + s * U}" y2="90" class="start-line"/><line x1="${20 + (s + n) * U}" y1="30" x2="${20 + (s + n) * U}" y2="90" class="start-line"/>
-      <text x="${15 * U + 24}" y="126" text-anchor="end" class="ruler-unit">cm</text>
+      <text x="${15 * U + 30}" y="22" text-anchor="end" class="ruler-unit">cm</text>
     </svg></div>`);
     $("stage").replaceChildren(wrap);
     setInstruction(`How long is the <b>${obj}</b>? (cm)`, `How long is the ${obj}? Use the ruler.`);

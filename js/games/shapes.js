@@ -83,8 +83,18 @@ const shapes = {
     const pl = SHAPES[target].plural;
     setInstruction(`Tap all the <b>${pl}</b>`, `Tap all the ${pl}.`);
   },
+  // a small finger that just misses still counts: the closest shape within 24px of the tap
+  nearest(e) {
+    let best = null, near = 24;
+    for (const s of task.svg.querySelectorAll(".shp[data-k]:not(.found)")) {
+      const r = s.getBoundingClientRect();
+      const d = Math.hypot(Math.max(r.left - e.clientX, 0, e.clientX - r.right), Math.max(r.top - e.clientY, 0, e.clientY - r.bottom));
+      if (d < near) { near = d; best = s; }
+    }
+    return best;
+  },
   tapShape(e) {
-    const t = task, el = e.target.closest(".shp");
+    const t = task, el = e.target.closest(".shp") || shapes.nearest(e);
     if (!el || busy || t.kind !== "hunt" || el.classList.contains("found")) return;
     const k = el.dataset.k;
     if (k === t.target) {

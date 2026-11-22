@@ -41,7 +41,8 @@ const tenbridge = {
       display: grid; grid-template-columns: repeat(5, var(--tenbridge-cell)); grid-auto-rows: var(--tenbridge-cell);
       background: var(--ink); gap: 4px; padding: 4px; border-radius: 12px; box-shadow: 0 6px 0 var(--lift);
     }
-    .tenbridge-frame.tenbridge-full { box-shadow: 0 0 0 5px var(--sun), 0 6px 0 var(--lift); animation: bump 0.35s ease-out; }
+    .tenbridge-frame.tenbridge-full { box-shadow: 0 0 0 5px var(--sun), 0 6px 0 var(--lift); animation: tenbridge-full 0.35s ease-out; }
+    @keyframes tenbridge-full { 50% { transform: scale(0.95); } }
     .tenbridge-cell { background: var(--paper); border-radius: 6px; display: grid; place-items: center; }
     .tenbridge-dot {
       width: 72%; aspect-ratio: 1; border-radius: 50%;

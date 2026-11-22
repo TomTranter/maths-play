@@ -7,6 +7,29 @@
 
 if (/[?&]selftest/.test(location.search)) addEventListener("load", () => setTimeout(runSelfTest, 400));
 
+// test.answer() clicks elements directly, which works even when a child couldn't see them, so also look.
+function screenProblems() {
+  const stage = $("stage"), board = stage.firstElementChild, out = [];
+  if (!board) return ["nothing on the stage"];
+  const slack = 3, sb = stage.getBoundingClientRect();
+  const name = (e) => `<${e.tagName.toLowerCase()} class="${e.getAttribute("class") || ""}">`;
+  for (const e of document.querySelectorAll("#stage button:not([disabled]), #ground button:not([disabled])")) {
+    const cs = getComputedStyle(e), r = e.getBoundingClientRect();
+    if (cs.display === "none" || cs.visibility === "hidden" || e.closest("[hidden]") || e.getAnimations().length) continue;
+    if (!r.width || !r.height) { out.push(`${name(e)} has no size`); continue; }
+    const box = stage.contains(e) ? sb : { left: 0, top: 0, right: innerWidth, bottom: innerHeight };
+    if (r.left < box.left - slack || r.top < box.top - slack || r.right > box.right + slack || r.bottom > box.bottom + slack) out.push(`${name(e)} is off the screen at ${innerWidth}×${innerHeight}`);
+    if (e.matches(".sym-card, .share-card, .choice") && !e.textContent.trim() && !e.querySelector("svg, .sq")) out.push(`${name(e)} is blank`);
+  }
+  for (const e of document.querySelectorAll("#ground > :not(button), #ground .box")) {
+    const g = e.getBoundingClientRect();
+    if (g.width && !e.getAnimations().length && (g.left < -slack || g.right > innerWidth + slack || g.bottom > innerHeight + slack)) out.push(`${name(e)} is off the grass at ${innerWidth}×${innerHeight}`);
+  }
+  const r = board.getBoundingClientRect();
+  if (!board.getAnimations({ subtree: true }).length && (r.left < sb.left - slack || r.top < sb.top - slack || r.right > sb.right + slack || r.bottom > sb.bottom + slack)) out.push(`the board doesn't fit at ${innerWidth}×${innerHeight}`);
+  return [...new Set(out)];
+}
+
 async function runSelfTest() {
   const only = new URLSearchParams(location.search).get("selftest") || "";
   const pause = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -38,6 +61,7 @@ async function runSelfTest() {
         gen++; g.next(true); busy = false;
         await pause(80);
         const t = task, s0 = S.score;
+        for (const p of screenProblems()) fails.push(`level ${lv + 1}: ${p}`);
         try { await g.test.answer(); }
         catch (e) { fails.push(`level ${lv + 1}: test.answer() threw "${e.message}"`); continue; }
         for (let i = 0; i < 240 && S.score === s0; i++) await pause(50); // up to 12s: a long robot route takes a while
@@ -48,7 +72,8 @@ async function runSelfTest() {
     }
     const said = [...heard].filter((l) => !before.has(l));
     const undeclared = g.voiceLines ? [...new Set(said.flatMap(sentences).filter((s) => !declared.has(clipKey(s))))] : [];
-    results.push({ id: g.id, status: fails.length ? "FAIL" : "ok", fails, undeclared });
+    fails.push(...markupErrors); markupErrors.clear();
+    results.push({ id: g.id, status: fails.length ? "FAIL" : "ok", fails: [...new Set(fails)], undeclared });
   }
   location.hash = "";
 

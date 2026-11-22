@@ -8,12 +8,14 @@ function cherrySVG(whole, a, b, showDots) {
   const dots = (n, cx, cy, r) => {
     if (!showDots || typeof n !== "number" || n > 10) return "";
     const pts = Array.from({ length: n }, (_, i) => { const row = Math.floor(i / 5), col = i % 5; return [cx - 28 + col * 14, cy + 24 + row * 13]; });
-    return pts.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="5" fill="#ff4d6d"/>`).join("");
+    return pts.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="5" fill="#fff" stroke="#9d1c27" stroke-width="1.5"/>`).join("");
   };
   const circle = (v, cx, cy, r, cls) => `<circle cx="${cx}" cy="${cy}" r="${r}" class="${cls}${v === "?" ? " missing" : ""}"/>
     <text x="${cx}" y="${cy + (showDots && typeof v === "number" && v <= 10 ? 2 : 14)}" text-anchor="middle" class="cherry-num${v === "?" ? " q" : ""}">${v}</text>`;
   return `<svg viewBox="0 0 320 270" aria-hidden="true">
     <path d="M160 92 L82 178 M160 92 L238 178" stroke="#3f8f33" stroke-width="8" stroke-linecap="round"/>
+    <path d="M170 116 q38 -22 66 4 q-34 26 -66 -4z" fill="#58c85f" stroke="#3f8f33" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M176 117 q26 2 52 2" stroke="#3f8f33" stroke-width="3" fill="none"/>
     ${circle(whole, 160, 62, 56, "whole")}${dots(whole, 160, 62)}
     ${circle(a, 82, 200, 52, "part")}${dots(a, 82, 200)}
     ${circle(b, 238, 200, 52, "part")}${dots(b, 238, 200)}
