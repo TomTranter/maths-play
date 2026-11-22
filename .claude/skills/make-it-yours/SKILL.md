@@ -23,7 +23,7 @@ Their app will be at `https://<their-user>.github.io/maths-play/` within a minut
 repository public; nothing about the child is stored online.
 
 On the tablet: open the address, then **Share → Add to Home Screen** (iPad) or **Install app** (Android), and
-open it once on wifi so it saves itself for offline play.
+open it on wifi and leave it open, screen on, for about 5 minutes so the voice (55 MB) saves for offline play.
 
 ## 2. Customise (common requests)
 

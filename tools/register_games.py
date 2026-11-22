@@ -5,12 +5,15 @@ Usage:  python3 tools/register_games.py
 - adds a <script> tag in index.html for any js/games/<id>.js that isn't listed (existing order is kept,
   because some games reuse drawing helpers from earlier files),
 - rewrites the game list in sw.js so new games are cached for offline use,
-- bumps the offline cache name in sw.js so installed copies pick up the new files.
+- bumps the offline cache name in sw.js so installed copies pick up the new files,
+- refreshes audio/cori/hashes.json so installed copies fetch new or re-recorded clips.
 
 Safe to run any time; it only changes things when there is something to change.
 """
 import re
 from pathlib import Path
+
+from voice_index import write_index
 
 ROOT = Path(__file__).resolve().parent.parent
 index = ROOT / "index.html"
@@ -37,3 +40,5 @@ if html2 != html or text2 != text:
     print(f"registered {len(games)} games" + (f"; added {', '.join(missing)}" if missing else "") + (f"; removed {', '.join(gone)}" if gone else ""))
 else:
     print(f"{len(games)} games already registered; nothing to do")
+if write_index():
+    print("voice list updated")

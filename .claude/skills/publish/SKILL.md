@@ -13,7 +13,7 @@ they open online.
 
 1. **Everything registered and recorded:**
    ```bash
-   python3 tools/register_games.py
+   python3 tools/register_games.py           # also refreshes audio/cori/hashes.json, which tablets update from
    nice -n 10 uv run tools/make_voice.py     # only if any spoken line changed; skip if Piper isn't set up
    ```
 2. **Bump the version** shown in the app: `APP_VERSION` in `js/core.js` (e.g. "3.1" → "3.2").
@@ -49,5 +49,6 @@ stars and levels stay in the browser on that device.
 
 - **Pushing without bumping `APP_VERSION`**: nobody can tell whether the tablet has the update.
 - **Publishing with missing recordings**: those lines use the tablet's own voice, which sounds robotic.
-- **Large voice changes**: the first open after publishing downloads the new clips in the background; tell the
-  parent to keep the tablet on wifi for a minute.
+- **Clips changed but `audio/cori/hashes.json` didn't**: tablets keep the old recordings offline. Run step 1 and commit it.
+- **Not saying how long the voice takes**: a first install downloads about 55 MB, so tell the parent to leave the app
+  open on wifi, screen on, for about 5 minutes (longer on slow wifi; it resumes next time). Updates fetch only changed clips.

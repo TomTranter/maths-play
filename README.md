@@ -37,8 +37,9 @@ Phones work either way up. On its side, the answers move to the right, under a t
 1. Open **<https://tomtranter.github.io/maths-play/>** on the tablet.
 2. **iPad / iPhone:** tap **Share** (the square with an arrow), then **Add to Home Screen**.
    **Android:** tap the **⋮** menu, then **Install app** (or **Add to Home screen**).
-3. Open it once from the new icon **while on wifi** and leave it for a minute: it downloads the voice so it
-   can play offline afterwards.
+3. Open it from the new icon **while on wifi** and leave it open, screen on, for **about 5 minutes** (longer on
+   slow wifi): it downloads the voice (about 55 MB) so it can play offline afterwards. They can play while it
+   downloads, and if it's interrupted it carries on the next time you open it online.
 
 That's it. Nothing to sign up for, no adverts, and nothing about your child is sent anywhere: stars and
 levels are saved only on that device.
@@ -176,7 +177,7 @@ no recording fall back to the device's own voice.
 ## How it's built
 
 Plain HTML, CSS and JavaScript: no build step, no frameworks, no tracking, no network requests (the
-[Baloo 2](https://fonts.google.com/specimen/Baloo+2) font is bundled). A service worker caches everything for offline play.
+[Baloo 2](https://fonts.google.com/specimen/Baloo+2) font is bundled). A service worker caches the app for offline play; the voice has its own cache, so an update only downloads new or re-recorded clips.
 
 ```
 index.html                page shell; loads core, every game, then main
@@ -186,7 +187,7 @@ css/scenery.css           sky, hills, meadow and paintwork
 js/core.js                engine: sound, voice, effects, stars, levels, choices, routing
 js/games/*.js             one file per game
 js/main.js, js/selftest.js  start-up; ?selftest runner
-sw.js                     offline cache
+sw.js                     offline cache for the app; js/offline.js saves the voice
 audio/cori/               the recorded voice
 tools/                    register_games.py, make_voice.py, collect_lines.mjs, game-template.js
 docs/                     ADDING_A_GAME.md, screenshots

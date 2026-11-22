@@ -36,6 +36,8 @@ import numpy as np
 import onnxruntime
 from piper import PiperVoice, SynthesisConfig
 
+from voice_index import write_index
+
 # Be kind to the computer: Piper's engine otherwise grabs every CPU core (and ignores taskset).
 # Set VOICE_THREADS to change it.
 _SessionOptions = onnxruntime.SessionOptions
@@ -454,6 +456,7 @@ def main() -> None:
         if f.name not in keep:
             f.unlink()
     (OUT / "manifest.json").write_text(json.dumps(manifest, separators=(",", ":"), sort_keys=True))
+    write_index()
     print(f"{len(manifest)} clips, {total / 1e6:.1f} MB")
 
 
