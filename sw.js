@@ -1,6 +1,6 @@
 // Number Garden service worker: precache the app; network-first so updates show up straight away
 // when online, falling back to the cache offline. Bump CACHE when the ASSETS list changes.
-const CACHE = "number-garden-v11";
+const CACHE = "number-garden-v12";
 const APP_CACHE = /^number-garden-v\d+$/; // only ever delete our own: other sites can share this origin
 const VOICE = "number-garden-voice"; // the clips, filled by js/offline.js; not cleared by app updates
 const ASSETS = [
