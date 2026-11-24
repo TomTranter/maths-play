@@ -379,12 +379,78 @@ MARKED = {"4", "12", "17", "25", "28", "38", "48", "54", "64", "65", "70", "88",
 NUMBER_KEY = re.compile(r"^\d+[ps]?$")
 
 
-def best_take(voice, text: str, speed: float, takes: int):
+# Words Tom heard as odd (samples/words.html, made by tools/word_samples.py) and the version he picked:
+# word -> (how to say it, steadier, slower). "How to say it" is espeak phonemes for the word, TIDY (clean up
+# the whole line's sounds, see tidy()) or None (same sounds). Every line using the word is recorded this way.
+TIDY = "tidy"
+STEADY = {"noise_scale": 0.4, "noise_w_scale": 0.5}  # less random wobble than Piper's default
+SLOWER = 1.12
+SAY = {
+    "many": ("mˈɛnɪ", False, False), "the": (TIDY, False, False), "away": ("əwˈeɪ", False, False),
+    "in": (TIDY, False, False), "across": ("əkɹˈɒs", True, False), "a": ("ə", False, False),
+    "ones": ("wˈʌnz", False, False), "tens": (None, True, True), "apple": (TIDY, False, False),
+    "past": ("pˈɑːst", False, False), "altogether": (TIDY, False, False), "biscuit": ("bˈɪskət", False, False),
+    "go": (None, True, False), "full": (None, True, False), "rule": (None, True, True), "row": (None, True, False),
+    "sunday": (None, True, False), "ladybird": ("lˈeɪdibɜːd", False, False), "five": (None, True, True),
+    "hexagon": ("hˈɛksəɡən", False, False), "pentagon": ("pˈɛntəɡən", False, False),
+    "rectangle": ("ɹˈɛktˌaŋɡəl", False, False), "triangle": (TIDY, True, False), "august": (None, True, True),
+    "four": (None, True, False), "place": (None, True, False), "triangles": (TIDY, False, False),
+    "use": ("jˈuːz", False, False), "hexagons": ("hˈɛksəɡənz", False, False),
+    "pentagons": ("pˈɛntəɡənz", False, False), "basket": ("bˈas kɪt", False, False), "get": ("ɡˈɛt", False, False),
+    "off": (None, True, True), "pour": (None, True, False), "bedtime": (None, True, True), "eat": (None, True, False),
+    "pictogram": (None, True, True), "prices": (None, True, False), "shapes": (None, True, False),
+}
+WAS = {"a": "ɐ"}  # how espeak says a word inside a line, where that differs from the word on its own
+
+
+def sounds(voice, text: str) -> str:
+    return " ".join("".join(s) for s in voice.phonemize(text))
+
+
+def tidy(line: str) -> str:
+    """espeak adds a glide (ʲ) between vowels ("the‿apple", "tri‿angle") and runs "in the" into one word."""
+    line = re.sub(r"ðɪʲ", "ði ", line)
+    line = re.sub(r"ɪnð([əi])", r"ɪn ð\1", line)
+    return re.sub(r"\s+", " ", line.replace("ʲ", "")).strip()
+
+
+def swap(voice, line: str, word: str, ph: str) -> tuple[str, int]:
+    """Replace the word's sounds in a line of sounds; returns (line, how many replaced)."""
+    was = WAS.get(word) or "".join(voice.phonemize(word)[0]).lstrip("ˈˌ")
+    loose = "[ˈˌ]?".join(re.escape(c) for c in was.replace("ˈ", "").replace("ˌ", ""))
+    return re.subn(rf"(?<![^\s])[ˈˌ]?{loose}ʲ?(?=[\s?!.,]|$)", ph, line)  # ʲ: a glide into the next word
+
+
+def say_as(voice, text: str, words) -> str:
+    """The whole line as sounds, with words respelled and/or tidied. (A [[...]] block mid-text makes Piper
+    read the punctuation after it aloud, e.g. "exclamation", so it's all or nothing.)"""
+    line = sounds(voice, text)
+    for w, ph in words:
+        if ph and ph != TIDY:
+            line = swap(voice, line, w, ph)[0]
+    if any(ph == TIDY for _, ph in words):
+        line = tidy(line)
+    return f"[[{line}]]"
+
+
+def recipe(voice, text: str, k: str, speed: float):
+    """(what to give Piper, settings, takes, speed) for a sentence, following SAY."""
+    picked = [(w, SAY[w]) for w in dict.fromkeys(k.split()) if w in SAY]
+    if not picked:
+        return text, {}, 1, speed
+    steady = any(st for _, (_, st, _) in picked)
+    said = say_as(voice, text, [(w, ph) for w, (ph, _, _) in picked if ph])
+    if said == f"[[{sounds(voice, text)}]]":
+        said = text  # nothing to change: plain text keeps Piper's own handling
+    return said, STEADY if steady else {}, 5 if steady else 1, SLOWER if any(sl for _, (_, _, sl) in picked) else speed
+
+
+def best_take(voice, text: str, speed: float, takes: int, settings=None):
     """Cori sometimes drags out or clips a word at random. Render several takes and keep the one
     with the most typical spoken length."""
     renders = []
     for _ in range(takes):
-        ch = list(voice.synthesize(text, syn_config=SynthesisConfig(length_scale=speed)))
+        ch = list(voice.synthesize(text, syn_config=SynthesisConfig(length_scale=speed, **(settings or {}))))
         renders.append((np.frombuffer(b"".join(c.audio_int16_bytes for c in ch), dtype="<i2"), ch[0].sample_rate))
     lengths = [spoken_length(p, r) for p, r in renders]
     mid = float(np.median(lengths))
@@ -434,10 +500,12 @@ def main() -> None:
     manifest: dict[str, str] = {}
     total = 0
     redo_numbers = "--redo-numbers" in sys.argv
+    redo_said = "--redo-said" in sys.argv  # after changing SAY: re-record the lines that use those words
     for i, (k, (text, speed)) in enumerate(clips.items()):
         name = filename(k)
         is_number = bool(NUMBER_KEY.match(k)) or k in STEPS
-        if (OUT / name).exists() and not (redo_numbers and is_number):  # resumable: keep clips already recorded
+        said = not is_number and any(w in SAY for w in k.split())
+        if (OUT / name).exists() and not (redo_numbers and is_number) and not (redo_said and said):  # resumable
             manifest[k] = name
             total += (OUT / name).stat().st_size
             continue
@@ -447,9 +515,9 @@ def main() -> None:
             raw, rate = best_take(voice, spoken, speed, 9 if k.rstrip("p") in MARKED else 5)
             pcm = trim_gentle(raw, rate)
         else:
-            chunks = list(voice.synthesize(spoken, syn_config=SynthesisConfig(length_scale=speed)))
-            rate = chunks[0].sample_rate
-            pcm = trim_gentle(np.frombuffer(b"".join(c.audio_int16_bytes for c in chunks), dtype="<i2"), rate)
+            spoken, settings, takes, speed = recipe(voice, spoken, k, speed)
+            raw, rate = best_take(voice, spoken, speed, takes, settings)
+            pcm = trim_gentle(raw, rate)
         data = to_mp3(pcm, rate)
         (OUT / name).write_bytes(data)
         manifest[k] = name

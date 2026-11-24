@@ -19,6 +19,8 @@ Maths games for 5–7 year olds (UK Year 1–2 curriculum). Plain HTML/CSS/JS se
 - **Voice**: Cori only (pre-recorded clips in `audio/cori/`, made by `tools/make_voice.py` with Piper). Lines without
   a clip fall back to the device voice, which sounds robotic. Recording is CPU-heavy (the script caps itself at 4 threads; set VOICE_THREADS to change): run it as
   `nice -n 10 uv run tools/make_voice.py`, and never alongside other heavy jobs.
+  Words that sounded wrong are fixed in `SAY` in `tools/make_voice.py` (respelled, steadier or slower; picked by ear on
+  `samples/words.html`, made by `tools/word_samples.py`). After changing `SAY`, re-record with `--redo-said`.
 - **Offline**: `sw.js` caches the app; `js/offline.js` saves the voice in `number-garden-voice`, checked against
   `audio/cori/hashes.json` (written by both tools above). Clip names don't change when re-recorded, so never skip that file.
 - **Self-test**: `python3 -m http.server 8000`, then `http://localhost:8000/?selftest` (or `?selftest=<id>`): plays

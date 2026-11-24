@@ -16,14 +16,24 @@ import shutil
 from collections import defaultdict
 
 import numpy as np
-from make_voice import MODEL, OUT, ROOT, all_clips, spoken_length, to_mp3, trim_gentle
+from make_voice import (
+    MODEL,
+    OUT,
+    ROOT,
+    STEADY,
+    TIDY,
+    all_clips,
+    say_as,
+    spoken_length,
+    to_mp3,
+    trim_gentle,
+)
 from piper import PiperVoice, SynthesisConfig
 
 SHEET = ROOT / "samples" / "words"
 
 # Words Tom marked as odd, with other ways of saying them (espeak phonemes; Piper reads [[...]] as sounds).
 # TIDY means: keep the word, but clean up the line's sounds (see tidy()).
-TIDY = "tidy"
 DECIDED = {"many": "mˈɛnɪ"}  # picked on the sheet; shown no more
 FIXES = {
     "the": [TIDY], "away": ["əwˈeɪ"], "in": [TIDY], "across": ["əkɹˈɒs"], "a": ["ə"],
@@ -35,14 +45,11 @@ FIXES = {
     "basket": ["bˈɑːskɪt", "bˈas kɪt", "bˈɑːs kɪt"], "get": ["ɡˈɛt"], "off": [], "pour": [], "bedtime": ["bˈɛd tˌaɪm"], "eat": ["ʔˈiːt"],
     "oops": ["ˈʊps", "wˈʊps"], "pictogram": ["pˈɪktəʊɡɹˌam", "pˈɪk tə ɡɹˌam"], "prices": [], "shapes": ["ʃˈeɪps"], "yes": [],
 }
-# How espeak says a word inside a line, where that differs from the word on its own.
-WAS = {"a": "ɐ"}
 # Lines that show the problem best, where the shortest ones wouldn't.
 SHOW = {
     "the": ["in the purse", "the apple costs", "the podium"],
     "in": ["in the purse", "put in", "count in"],
 }
-STEADY = {"noise_scale": 0.4, "noise_w_scale": 0.5}
 TAKES = 5
 
 
@@ -56,29 +63,8 @@ def render(voice, text, settings, takes=1, speed=1.0):
     return to_mp3(trim_gentle(pcm, rate), rate)
 
 
-def sounds(voice, text):
-    return " ".join("".join(s) for s in voice.phonemize(text))
-
-
-def tidy(line):
-    """espeak adds a glide (ʲ) between vowels ("the‿apple", "tri‿angle") and runs "in the" into one word."""
-    line = re.sub(r"ðɪʲ", "ði ", line)
-    line = re.sub(r"ɪnð([əi])", r"ɪn ð\1", line)
-    return re.sub(r"\s+", " ", line.replace("ʲ", "")).strip()
-
-
 def respell(voice, text, word, ph):
-    """The whole line as sounds, with the word's swapped (or the line tidied). (A [[...]] block mid-text
-    makes Piper read the punctuation after it aloud, e.g. "exclamation".)"""
-    line = sounds(voice, text)
-    if ph == TIDY:
-        return f"[[{tidy(line)}]]"
-    was = WAS.get(word) or "".join(voice.phonemize(word)[0]).lstrip("ˈˌ")
-    loose = "[ˈˌ]?".join(re.escape(c) for c in was.replace("ˈ", "").replace("ˌ", ""))
-    new, n = re.subn(rf"(?<![^\s])[ˈˌ]?{loose}(?=[\s?!.,]|$)", ph, line)
-    if not n:
-        raise SystemExit(f"can't find {word!r} (/{was}/) in /{line}/")
-    return f"[[{new}]]"
+    return say_as(voice, text, [(word, ph)])
 
 
 def variants(word):
