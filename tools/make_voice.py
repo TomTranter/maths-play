@@ -400,8 +400,9 @@ def to_mp3(pcm: np.ndarray, rate: int) -> bytes:
     return enc.encode(np.clip(pcm, -32768, 32767).astype("<i2").tobytes()) + enc.flush()
 
 
-def main() -> None:
-    clips: dict[str, tuple[str, float]] = {}  # key -> (text to render, speed)
+def all_clips() -> dict[str, tuple[str, float]]:
+    """Every clip the app needs: key -> (text to render, speed)."""
+    clips: dict[str, tuple[str, float]] = {}
     for p in PHRASES:
         clips.setdefault(key(p), (p, SPEED_FRAGMENT))
     for n in range(0, 101):
@@ -418,7 +419,11 @@ def main() -> None:
         for part in re.findall(r"[^.!?]+[.!?]*", text):
             if key(part):
                 clips[key(part)] = (part.strip(), SPEED_SENTENCE)  # whole sentences win over same-key fragments
+    return clips
 
+
+def main() -> None:
+    clips = all_clips()
     if "--count" in sys.argv:
         print(len(clips), "clips")
         return

@@ -4,7 +4,7 @@
 36 games, big buttons, every instruction read aloud, stars for right answers and nothing lost for wrong ones.
 It works on an iPad, Android tablet, phone or computer, and keeps working offline.
 
-**Play it now: <https://tomtranter.github.io/maths-play/>**
+**Play it now: <https://tomtranter.github.io/maths-play/>** · [How to install it on a tablet](#how-to-install)
 
 ![The Number Garden home screen: a grid of colourful game tiles on a sky and grass background](docs/images/home.png)
 
@@ -32,17 +32,40 @@ Phones work either way up. On its side, the answers move to the right, under a t
 
 ---
 
-## Put it on your child's tablet (2 minutes)
+## How to install
 
-1. Open **<https://tomtranter.github.io/maths-play/>** on the tablet.
-2. **iPad / iPhone:** tap **Share** (the square with an arrow), then **Add to Home Screen**.
-   **Android:** tap the **⋮** menu, then **Install app** (or **Add to Home screen**).
-3. Open it from the new icon **while on wifi** and leave it open, screen on, for **about 5 minutes** (longer on
-   slow wifi): it downloads the voice (about 55 MB) so it can play offline afterwards. They can play while it
-   downloads, and if it's interrupted it carries on the next time you open it online.
+Number Garden is a website that installs like an app: no app store, nothing to sign up for, no adverts. Install it
+on the device your child will use, then open it once on wifi so the voice saves for offline play.
 
-That's it. Nothing to sign up for, no adverts, and nothing about your child is sent anywhere: stars and
-levels are saved only on that device.
+**iPad or iPhone (Safari)**
+
+1. Open **<https://tomtranter.github.io/maths-play/>** in Safari.
+2. Tap **Share** (the square with an arrow, at the top on an iPad, the bottom on an iPhone).
+3. Scroll down and tap **Add to Home Screen**, then **Add**.
+
+In Chrome on an iPad or iPhone it's the same: tap **Share** in the address bar, then **Add to Home Screen**.
+
+**Android phone or tablet (Chrome)**
+
+1. Open **<https://tomtranter.github.io/maths-play/>** in Chrome.
+2. Tap the **⋮** menu, then **Install app** (or **Add to Home screen**), then **Install**.
+
+**Computer (Chrome or Edge)**
+
+Open the address and click the **install** icon at the right of the address bar (a screen with a down arrow),
+or use the menu: **Cast, save and share → Install page as app** in Chrome, **Apps → Install this site as an app**
+in Edge. On a Mac, Safari can do it too: **File → Add to Dock**. Or just bookmark it.
+
+**Then, on wifi:** open it from the new icon and leave it open, screen on, for **about 5 minutes** (longer on slow
+wifi). It downloads the voice (about 55 MB) so it can play offline afterwards. Your child can play while it
+downloads, and if it's interrupted it carries on the next time it's opened online.
+
+**Updates** arrive by themselves: whenever it's opened online it fetches the latest version. To check, open a game
+and tap the level button; the version number is at the bottom of the list.
+
+**Removing it:** delete the icon like any other app. On an iPad or iPhone that also clears the stars and levels;
+elsewhere, clear the site's data in the browser's settings. Progress is saved only on that device: nothing about
+your child is sent anywhere.
 
 ## Hints for grown-ups
 
