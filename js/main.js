@@ -35,7 +35,7 @@ function openLevelPicker(g) {
   });
   el.querySelector(".cancel").onclick = () => el.remove();
 }
-addEventListener("hashchange", show);
+addEventListener("hashchange", () => { closeSheets(); show(); }); // a level list left open by Back would start a game on the home screen
 
 (function start() {
   const saved = loadState();

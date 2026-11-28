@@ -616,7 +616,17 @@ span.sq { display: block; }
 .reset-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
 .panel .danger { height: 48px; font-size: 1rem; padding: 0 14px; box-shadow: 0 4px 0 var(--lift); border: 2px solid #f3c4d3; }
 .panel .danger.armed { background: var(--pink); color: var(--paper); border-color: var(--pink); }
-.level-list { display: grid; gap: 8px; }
+/* Scrolls inside the panel when a phone on its side is too short for every level and Close. */
+.panel > .level-list {
+  flex: 0 1 auto; min-height: 64px; overflow-y: auto; display: grid; align-content: start; gap: 8px; padding: 2px;
+  overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y;
+}
+@media (max-height: 480px) {
+  .panel { padding: 12px 16px 14px; gap: 6px; }
+  .panel h2 { font-size: 1.3rem; }
+  .level-btn { min-height: 52px; padding: 4px 12px; font-size: 1.2rem; }
+  .panel .cancel { height: 48px; }
+}
 .level-btn {
   display: flex; align-items: center; gap: 14px; border: 3px solid var(--sky-low); border-radius: 18px;
   background: var(--paper); padding: 8px 14px; font-size: 1.4rem; font-weight: 800; text-align: left; min-height: 64px;
